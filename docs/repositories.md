@@ -2,8 +2,8 @@
 
 Каждая модель имеет файл в `src/db/repositories`. Функции следуют образцу
 `userRepository.ts`: именованные `async`-функции, общий `db`, `try/catch`,
-`console.error` и повторное выбрасывание ошибки. Можно импортировать функции из
-конкретного файла или из `src/db/repositories/index.ts`.
+`console.error` и повторное выбрасывание ошибки. Импортируйте функции из
+конкретного файла в подкаталогах `card`, `user`, `grammar`.
 
 ## Общий контракт
 
@@ -157,13 +157,11 @@ Telegram ID. Для нового кода есть явные `getUserByTelegram
 ## Пример
 
 ```ts
-import {
-  getOrCreateUser,
-  getCards,
-  getRuleDetails,
-  saveUserRuleComment,
-  getDueUserCardMeanings,
-} from "./db/repositories";
+import { getOrCreateUser } from "./db/repositories/user/userRepository";
+import { getCards } from "./db/repositories/card/cardRepository";
+import { getRuleDetails } from "./db/repositories/grammar/ruleRepository";
+import { saveUserRuleComment } from "./db/repositories/user/userRuleCommentRepository";
+import { getDueUserCardMeanings } from "./db/repositories/user/userCardMeaningRepository";
 
 const { user } = await getOrCreateUser({
   telegramId: ctx.from.id,
