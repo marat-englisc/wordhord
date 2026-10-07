@@ -1,8 +1,10 @@
 import type { Bot } from "grammy";
+import type { BotContext } from "./types";
+import { configureBotCommands } from "./handlers";
 
 /** Wait for in-flight middleware before releasing the database connection. */
 export async function runBot(
-  bot: Bot,
+  bot: Bot<BotContext>,
   close: () => void,
   logger: Pick<Console, "error"> = console,
 ): Promise<void> {
@@ -26,6 +28,8 @@ export async function runBot(
       // start() begins getMe before creating its polling abort controller.
       // grammY's Node types still use the legacy AbortSignal shim.
       await bot.init(initialization.signal as unknown as Parameters<Bot["init"]>[0]);
+      if (initialization.signal.aborted) return;
+      await configureBotCommands(bot, initialization.signal as unknown as Parameters<Bot["init"]>[0]);
     } catch (error) {
       if (initialization.signal.aborted) return;
       throw error;

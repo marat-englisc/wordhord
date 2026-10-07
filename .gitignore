@@ -3,3 +3,8 @@ node_modules
 .env
 .env.*
 !.env.example
+content.db
+users.db
+*.db-journal
+audio/*
+!audio/.gitkeep
