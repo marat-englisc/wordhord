@@ -10,5 +10,7 @@ export const deckTable = sqliteTable("deck", {
     .notNull()
     .default(sql`(CURRENT_TIMESTAMP)`),
 
-  updatedAt: text("updated_at").notNull(),
+  updatedAt: text("updated_at")
+    .notNull()
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });

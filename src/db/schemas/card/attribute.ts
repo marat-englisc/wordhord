@@ -10,5 +10,7 @@ export const attributeTable = sqliteTable("attribute", {
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 
-  updatedAt: text("updated_at").notNull(),
+  updatedAt: text("updated_at")
+    .notNull()
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });

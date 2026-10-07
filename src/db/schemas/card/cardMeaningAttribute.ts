@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  index,
   integer,
   sqliteTable,
   uniqueIndex,
@@ -31,7 +32,9 @@ export const cardMeaningAttributeTable = sqliteTable(
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
 
-    updatedAt: text("updated_at").notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [
     uniqueIndex("card_meaning_attribute_unique").on(
@@ -39,5 +42,6 @@ export const cardMeaningAttributeTable = sqliteTable(
       table.attributeId,
       table.value,
     ),
+    index("card_meaning_attributes_attribute_idx").on(table.attributeId),
   ],
 );

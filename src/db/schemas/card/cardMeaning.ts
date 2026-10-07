@@ -23,7 +23,9 @@ export const cardMeaningTable = sqliteTable(
       .notNull()
       .default(sql`(CURRENT_TIMESTAMP)`),
 
-    updatedAt: text("updated_at").notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [index("card_meanings_card_id_index").on(table.cardId)],
 );

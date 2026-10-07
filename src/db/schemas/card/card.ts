@@ -23,7 +23,9 @@ export const cardTable = sqliteTable(
       .notNull()
       .default(sql`(CURRENT_TIMESTAMP)`),
 
-    updatedAt: text("updated_at").notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [index("cards_deck_id_index").on(table.deckId)],
 );

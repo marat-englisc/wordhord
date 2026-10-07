@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
 import { deckTable } from "../card/deck";
 
@@ -26,5 +32,8 @@ export const userDeckTable = sqliteTable(
 
     lastReviewedAt: integer("last_reviewed_at", { mode: "timestamp_ms" }),
   },
-  (table) => [uniqueIndex("user_deck_unique").on(table.userId, table.deckId)],
+  (table) => [
+    uniqueIndex("user_deck_unique").on(table.userId, table.deckId),
+    index("user_decks_deck_idx").on(table.deckId),
+  ],
 );
