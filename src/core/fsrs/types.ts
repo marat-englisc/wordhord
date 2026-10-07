@@ -52,7 +52,12 @@ export interface StudySnapshot {
   activity: DailyActivity;
 }
 
-export type StudyReason = "learning" | "relearning" | "overdue" | "due_today" | "new";
+export type StudyReason =
+  | "learning"
+  | "relearning"
+  | "overdue"
+  | "due_today"
+  | "new";
 
 export interface StudyPriority {
   score: number;
@@ -126,7 +131,10 @@ export interface StudyRepository {
     day: StudyDay,
     deckId: number | undefined,
     newPerDeckLimit: number,
-    preferences?: { siblingSpacing?: number; recentCardIds?: readonly number[] },
+    preferences?: {
+      siblingSpacing?: number;
+      recentCardIds?: readonly number[];
+    },
   ): StudySnapshot;
   getCandidate(userId: number, cardMeaningId: number): StudyCandidate | null;
   commitReview(

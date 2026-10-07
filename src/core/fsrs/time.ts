@@ -10,8 +10,6 @@ export function validateDate(value: Date, label = "now"): void {
 }
 
 function getFormatter(timeZone: string): Intl.DateTimeFormat {
-  // Intl also accepts fixed offsets. Study days deliberately use named zones
-  // so their boundaries follow the zone's historical and daylight-saving rules.
   if (
     typeof timeZone !== "string" ||
     timeZone.length === 0 ||
@@ -51,8 +49,6 @@ function getLocalDay(formatter: Intl.DateTimeFormat, instant: number) {
 
   return {
     key: `${yearLabel}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
-    // This ordered key does not need to count elapsed days. Its spacing avoids
-    // Date.UTC's special handling of years 0..99 and Date's range boundaries.
     ordinal: year * 372 + (month - 1) * 31 + day,
   };
 }
@@ -73,7 +69,6 @@ function findBoundary(
   return after;
 }
 
-/** UTC bounds of the local calendar day, including 23/25-hour DST days. */
 export function getStudyDay(
   now: Date,
   timeZone: string,
@@ -86,12 +81,23 @@ export function getStudyDay(
   const after = Math.min(MAX_DATE_MS, instant + 3 * DAY_MS);
   const localOrdinal = (value: number) => getLocalDay(formatter, value).ordinal;
 
-  if (localOrdinal(before) >= day.ordinal || localOrdinal(after) <= day.ordinal) {
+  if (
+    localOrdinal(before) >= day.ordinal ||
+    localOrdinal(after) <= day.ordinal
+  ) {
     throw new RangeError("The study day exceeds Date's representable range.");
   }
 
-  const start = findBoundary(before, instant, (value) => localOrdinal(value) >= day.ordinal);
-  const end = findBoundary(instant, after, (value) => localOrdinal(value) > day.ordinal);
+  const start = findBoundary(
+    before,
+    instant,
+    (value) => localOrdinal(value) >= day.ordinal,
+  );
+  const end = findBoundary(
+    instant,
+    after,
+    (value) => localOrdinal(value) > day.ordinal,
+  );
 
   return { key: day.key, start: new Date(start), end: new Date(end) };
 }

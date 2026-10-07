@@ -19,7 +19,6 @@ export const userRuleCommentTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    // content.db reference, enforced by the application connection's TEMP triggers.
     ruleId: integer("rule_id").notNull(),
 
     comment: text("comment").notNull(),

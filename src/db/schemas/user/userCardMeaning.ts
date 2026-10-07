@@ -22,7 +22,6 @@ export const userCardMeaningTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    // content.db reference, enforced by the application connection's TEMP triggers.
     cardMeaningId: integer("card_meaning_id").notNull(),
 
     due: integer("due", { mode: "timestamp_ms" }).notNull(),
@@ -54,7 +53,6 @@ export const userCardMeaningTable = sqliteTable(
     index("user_card_meanings_due_idx").on(table.userId, table.due),
     index("user_card_meanings_card_meaning_idx").on(table.cardMeaningId),
 
-    // SQLite requires a matching UNIQUE key for the review's composite foreign key.
     unique("user_card_meaning_identity_unique").on(
       table.id,
       table.userId,

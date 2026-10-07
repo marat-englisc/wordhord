@@ -45,7 +45,6 @@ function getUserConditions(filters: UserFilters) {
   );
 }
 
-/** Compatibility: this original function looks up the Telegram ID. */
 export async function getUserById(telegramId: number) {
   try {
     const user = await db

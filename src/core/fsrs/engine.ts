@@ -21,7 +21,9 @@ const DAY_MS = 86_400_000;
 
 export function validateGrade(value: number): asserts value is Grade {
   if (!Number.isInteger(value) || value < 1 || value > 4) {
-    throw new RangeError("rating must be an integer: Again=1, Hard=2, Good=3, Easy=4");
+    throw new RangeError(
+      "rating must be an integer: Again=1, Hard=2, Good=3, Easy=4",
+    );
   }
 }
 
@@ -29,16 +31,22 @@ function validateSettings(settings: Partial<FSRSParameters>) {
   if (
     settings.request_retention !== undefined &&
     (!Number.isFinite(settings.request_retention) ||
-      settings.request_retention <= 0 || settings.request_retention >= 1)
+      settings.request_retention <= 0 ||
+      settings.request_retention >= 1)
   ) {
-    throw new RangeError("request_retention must be between 0 and 1 exclusively");
+    throw new RangeError(
+      "request_retention must be between 0 and 1 exclusively",
+    );
   }
   if (
     settings.maximum_interval !== undefined &&
     (!Number.isSafeInteger(settings.maximum_interval) ||
-      settings.maximum_interval < 1 || settings.maximum_interval > 36_500)
+      settings.maximum_interval < 1 ||
+      settings.maximum_interval > 36_500)
   ) {
-    throw new RangeError("maximum_interval must be an integer between 1 and 36500 days");
+    throw new RangeError(
+      "maximum_interval must be an integer between 1 and 36500 days",
+    );
   }
   for (const key of ["enable_fuzz", "enable_short_term"] as const) {
     if (settings[key] !== undefined && typeof settings[key] !== "boolean") {
@@ -47,7 +55,8 @@ function validateSettings(settings: Partial<FSRSParameters>) {
   }
   if (settings.w !== undefined) {
     if (
-      !Array.isArray(settings.w) || settings.w.length !== 21 ||
+      !Array.isArray(settings.w) ||
+      settings.w.length !== 21 ||
       Array.from(settings.w).some((value) => !Number.isFinite(value))
     ) {
       throw new RangeError("FSRS 6 requires exactly 21 finite weights");
@@ -61,9 +70,17 @@ function validateSettings(settings: Partial<FSRSParameters>) {
     let previous = 0;
     for (const step of steps) {
       const match = /^(\d+)(m|h)$/.exec(step);
-      const minutes = match ? Number(match[1]) * (match[2] === "h" ? 60 : 1) : NaN;
-      if (!Number.isSafeInteger(minutes) || minutes <= previous || minutes >= 1440) {
-        throw new RangeError(`${key} must contain increasing positive steps shorter than one day`);
+      const minutes = match
+        ? Number(match[1]) * (match[2] === "h" ? 60 : 1)
+        : NaN;
+      if (
+        !Number.isSafeInteger(minutes) ||
+        minutes <= previous ||
+        minutes >= 1440
+      ) {
+        throw new RangeError(
+          `${key} must contain increasing positive steps shorter than one day`,
+        );
       }
       previous = minutes;
     }
@@ -72,32 +89,55 @@ function validateSettings(settings: Partial<FSRSParameters>) {
 
 export function validateProgress(progress: UserCardMeaning, now: Date) {
   const invalid = (message: string): never => {
-    throw new StudyError("INVALID_PROGRESS", `Progress ${progress.id}: ${message}`);
+    throw new StudyError(
+      "INVALID_PROGRESS",
+      `Progress ${progress.id}: ${message}`,
+    );
   };
-  if (!Number.isInteger(progress.state) || progress.state < 0 || progress.state > 3) {
+  if (
+    !Number.isInteger(progress.state) ||
+    progress.state < 0 ||
+    progress.state > 3
+  ) {
     invalid("invalid state");
   }
-  if (!Number.isFinite(progress.stability) || progress.stability < 0 ||
-    !Number.isFinite(progress.difficulty) || progress.difficulty < 0 || progress.difficulty > 10) {
+  if (
+    !Number.isFinite(progress.stability) ||
+    progress.stability < 0 ||
+    !Number.isFinite(progress.difficulty) ||
+    progress.difficulty < 0 ||
+    progress.difficulty > 10
+  ) {
     invalid("invalid stability or difficulty");
   }
-  for (const key of ["elapsedDays", "scheduledDays", "learningSteps", "reps", "lapses"] as const) {
+  for (const key of [
+    "elapsedDays",
+    "scheduledDays",
+    "learningSteps",
+    "reps",
+    "lapses",
+  ] as const) {
     if (!Number.isSafeInteger(progress[key]) || progress[key] < 0) {
       invalid(`invalid ${key}`);
     }
   }
   try {
     validateDate(progress.due, "due");
-    if (progress.lastReview !== null) validateDate(progress.lastReview, "lastReview");
+    if (progress.lastReview !== null)
+      validateDate(progress.lastReview, "lastReview");
   } catch {
     invalid("invalid date");
   }
   if (progress.lastReview && progress.lastReview.getTime() > now.getTime()) {
     invalid("lastReview is in the future");
   }
-  if (progress.state !== State.New &&
-    (!progress.lastReview || progress.stability <= 0 || progress.difficulty < 1)) {
-    invalid("a learned card needs lastReview, positive stability and difficulty >= 1");
+  if (
+    progress.state !== State.New &&
+    (!progress.lastReview || progress.stability <= 0 || progress.difficulty < 1)
+  ) {
+    invalid(
+      "a learned card needs lastReview, positive stability and difficulty >= 1",
+    );
   }
 }
 
@@ -112,7 +152,9 @@ export function toFsrsCard(progress: UserCardMeaning): Card {
     reps: progress.reps,
     lapses: progress.lapses,
     state: progress.state,
-    last_review: progress.lastReview ? new Date(progress.lastReview) : undefined,
+    last_review: progress.lastReview
+      ? new Date(progress.lastReview)
+      : undefined,
   };
 }
 
@@ -121,14 +163,27 @@ export function getProgressVersion(
   cardMeaningId: number,
   progress: UserCardMeaning | null,
 ): string {
-  const snapshot = progress ? [
-    progress.id, progress.userId, progress.cardMeaningId, progress.due.getTime(),
-    progress.stability, progress.difficulty, progress.elapsedDays, progress.scheduledDays,
-    progress.learningSteps, progress.reps, progress.lapses, progress.state,
-    progress.lastReview?.getTime() ?? null,
-  ] : null;
-  return createHash("sha256").update(JSON.stringify([userId, cardMeaningId, snapshot]))
-    .digest("hex").slice(0, 32);
+  const snapshot = progress
+    ? [
+        progress.id,
+        progress.userId,
+        progress.cardMeaningId,
+        progress.due.getTime(),
+        progress.stability,
+        progress.difficulty,
+        progress.elapsedDays,
+        progress.scheduledDays,
+        progress.learningSteps,
+        progress.reps,
+        progress.lapses,
+        progress.state,
+        progress.lastReview?.getTime() ?? null,
+      ]
+    : null;
+  return createHash("sha256")
+    .update(JSON.stringify([userId, cardMeaningId, snapshot]))
+    .digest("hex")
+    .slice(0, 32);
 }
 
 function mapResult(result: RecordLogItem): ScheduledReview {
@@ -153,7 +208,6 @@ function mapResult(result: RecordLogItem): ScheduledReview {
     review: {
       rating: log.rating,
       state: log.state,
-      // Preserve TS-FSRS's log semantics, including the previous last_review.
       due: new Date(log.due),
       stability: log.stability,
       difficulty: log.difficulty,
@@ -174,11 +228,18 @@ export function createFsrsEngine(settings: Partial<FSRSParameters> = {}) {
   const scheduler = fsrs({
     ...settings,
     w: settings.w ? [...settings.w] : undefined,
-    learning_steps: settings.learning_steps ? [...settings.learning_steps] : undefined,
-    relearning_steps: settings.relearning_steps ? [...settings.relearning_steps] : undefined,
+    learning_steps: settings.learning_steps
+      ? [...settings.learning_steps]
+      : undefined,
+    relearning_steps: settings.relearning_steps
+      ? [...settings.relearning_steps]
+      : undefined,
     enable_fuzz: settings.enable_fuzz ?? true,
   });
-  scheduler.useStrategy(StrategyMode.SEED, GenSeedStrategyWithCardId("studySeed"));
+  scheduler.useStrategy(
+    StrategyMode.SEED,
+    GenSeedStrategyWithCardId("studySeed"),
+  );
 
   const input = (progress: UserCardMeaning | null, now: Date, seed: string) => {
     validateDate(now);
@@ -201,13 +262,21 @@ export function createFsrsEngine(settings: Partial<FSRSParameters> = {}) {
       };
     },
     schedule(
-      progress: UserCardMeaning | null, rating: Grade, now: Date, seed = "study:",
+      progress: UserCardMeaning | null,
+      rating: Grade,
+      now: Date,
+      seed = "study:",
     ): ScheduledReview {
       validateGrade(rating);
-      return mapResult(scheduler.next(input(progress, now, seed), new Date(now), rating));
+      return mapResult(
+        scheduler.next(input(progress, now, seed), new Date(now), rating),
+      );
     },
     preview(progress: UserCardMeaning | null, now: Date, seed = "study:") {
-      const results = scheduler.repeat(input(progress, now, seed), new Date(now));
+      const results = scheduler.repeat(
+        input(progress, now, seed),
+        new Date(now),
+      );
       const outcomes = {} as Record<Grade, ScheduledReview>;
       for (const grade of Grades) outcomes[grade] = mapResult(results[grade]);
       return outcomes;
@@ -216,7 +285,10 @@ export function createFsrsEngine(settings: Partial<FSRSParameters> = {}) {
       validateDate(now);
       validateProgress(progress, now);
       if (progress.state === State.New) return null;
-      const elapsedDays = Math.max(0, (now.getTime() - progress.lastReview!.getTime()) / DAY_MS);
+      const elapsedDays = Math.max(
+        0,
+        (now.getTime() - progress.lastReview!.getTime()) / DAY_MS,
+      );
       return scheduler.forgetting_curve(elapsedDays, progress.stability);
     },
   };

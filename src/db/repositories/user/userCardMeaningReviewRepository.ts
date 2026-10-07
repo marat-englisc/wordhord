@@ -202,7 +202,6 @@ export async function recordUserCardMeaningReview(
 ) {
   try {
     validateUpdate(progress, ["userId", "cardMeaningId"]);
-    // node:sqlite uses synchronous transaction callbacks; each statement executes with .get().
     return db.transaction((tx) => {
       const existing = tx
         .select()

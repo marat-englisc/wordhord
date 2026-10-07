@@ -19,7 +19,6 @@ export const userDeckTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    // content.db reference, enforced by the application connection's TEMP triggers.
     deckId: integer("deck_id").notNull(),
 
     createdAt: text("created_at")
