@@ -1,19 +1,17 @@
 import {
   index,
   integer,
-  pgTable,
+  sqliteTable,
   real,
-  smallint,
-  timestamp,
   uniqueIndex,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
 import { cardMeaningTable } from "../card/cardMeaning";
 
-export const userCardMeaningTable = pgTable(
+export const userCardMeaningTable = sqliteTable(
   "user_card_meaning",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     userId: integer("user_id")
       .notNull()
@@ -27,9 +25,7 @@ export const userCardMeaningTable = pgTable(
         onDelete: "cascade",
       }),
 
-    due: timestamp("due", {
-      withTimezone: true,
-    }).notNull(),
+    due: integer("due", { mode: "timestamp_ms" }).notNull(),
 
     stability: real("stability").notNull(),
 
@@ -45,11 +41,9 @@ export const userCardMeaningTable = pgTable(
 
     lapses: integer("lapses").notNull(),
 
-    state: smallint("state").notNull(),
+    state: integer("state").notNull(),
 
-    lastReview: timestamp("last_review", {
-      withTimezone: true,
-    }),
+    lastReview: integer("last_review", { mode: "timestamp_ms" }),
   },
   (table) => [
     uniqueIndex("user_card_meaning_unique").on(

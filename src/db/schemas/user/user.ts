@@ -1,32 +1,24 @@
-import {
-  bigint,
-  integer,
-  pgTable,
-  varchar,
-  boolean,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
-export const userTable = pgTable("user", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const userTable = sqliteTable("user", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
 
-  telegramId: bigint("telegram_id", { mode: "bigint" }).notNull().unique(),
+  telegramId: integer("telegram_id").notNull().unique(),
 
-  username: varchar("username", { length: 255 }),
+  username: text("username"),
 
-  firstName: varchar("first_name", { length: 255 }),
+  firstName: text("first_name"),
 
-  lastName: varchar("last_name", { length: 255 }),
+  lastName: text("last_name"),
 
-  isAdmin: boolean("is_admin").notNull().default(false),
+  isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false),
 
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
+  createdAt: text("created_at")
     .notNull()
-    .defaultNow(),
+    .default(sql`(CURRENT_TIMESTAMP)`),
 
-  updatedAt: timestamp("updated_at", {
-    withTimezone: true,
-  }).notNull(),
+  updatedAt: text("updated_at")
+    .notNull()
+    .default(sql`(CURRENT_TIMESTAMP)`),
 });

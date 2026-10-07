@@ -1,17 +1,14 @@
-import { integer, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const attributeTable = pgTable("attribute", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+export const attributeTable = sqliteTable("attribute", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
 
-  name: varchar("name", { length: 255 }).notNull(),
+  name: text("name").notNull(),
 
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
-    .defaultNow()
+  createdAt: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 
-  updatedAt: timestamp("updated_at", {
-    withTimezone: true,
-  }).notNull(),
+  updatedAt: text("updated_at").notNull(),
 });

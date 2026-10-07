@@ -1,17 +1,17 @@
+import { sql } from "drizzle-orm";
 import {
   integer,
-  pgTable,
-  timestamp,
+  sqliteTable,
   uniqueIndex,
-  varchar,
-} from "drizzle-orm/pg-core";
+  text,
+} from "drizzle-orm/sqlite-core";
 import { attributeTable } from "./attribute";
 import { cardMeaningTable } from "./cardMeaning";
 
-export const cardMeaningAttributeTable = pgTable(
+export const cardMeaningAttributeTable = sqliteTable(
   "card_meaning_attribute",
   {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     cardMeaningId: integer("card_meaning_id")
       .notNull()
@@ -25,17 +25,13 @@ export const cardMeaningAttributeTable = pgTable(
         onDelete: "cascade",
       }),
 
-    value: varchar("value", { length: 255 }).notNull(),
+    value: text("value").notNull(),
 
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-    })
-      .defaultNow()
+    createdAt: text("created_at")
+      .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
 
-    updatedAt: timestamp("updated_at", {
-      withTimezone: true,
-    }).notNull(),
+    updatedAt: text("updated_at").notNull(),
   },
   (table) => [
     uniqueIndex("card_meaning_attribute_unique").on(

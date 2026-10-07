@@ -1,10 +1,11 @@
-import { pgTable, text, integer, timestamp, index } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { deckTable } from "./deck";
 
-export const cardTable = pgTable(
+export const cardTable = sqliteTable(
   "card",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     deckId: integer("deck_id")
       .notNull()
@@ -18,15 +19,11 @@ export const cardTable = pgTable(
 
     audioUrl: text("audio_url"),
 
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-    })
+    createdAt: text("created_at")
       .notNull()
-      .defaultNow(),
+      .default(sql`(CURRENT_TIMESTAMP)`),
 
-    updatedAt: timestamp("updated_at", {
-      withTimezone: true,
-    }).notNull(),
+    updatedAt: text("updated_at").notNull(),
   },
   (table) => [index("cards_deck_id_index").on(table.deckId)],
 );

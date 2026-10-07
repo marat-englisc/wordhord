@@ -1,10 +1,10 @@
-import { index, integer, pgTable, text } from "drizzle-orm/pg-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { cardMeaningTable } from "./cardMeaning";
 
-export const cardExampleTable = pgTable(
+export const cardExampleTable = sqliteTable(
   "card_example",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     cardMeaningId: integer("card_meaning_id")
       .notNull()

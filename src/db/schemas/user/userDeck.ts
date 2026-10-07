@@ -1,11 +1,12 @@
-import { integer, pgTable, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
 import { deckTable } from "../card/deck";
 
-export const userDeckTable = pgTable(
+export const userDeckTable = sqliteTable(
   "user_deck",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     userId: integer("user_id")
       .notNull()
@@ -19,15 +20,11 @@ export const userDeckTable = pgTable(
         onDelete: "cascade",
       }),
 
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-    })
+    createdAt: text("created_at")
       .notNull()
-      .defaultNow(),
+      .default(sql`(CURRENT_TIMESTAMP)`),
 
-    lastReviewedAt: timestamp("last_reviewed_at", {
-      withTimezone: true,
-    }),
+    lastReviewedAt: integer("last_reviewed_at", { mode: "timestamp_ms" }),
   },
   (table) => [uniqueIndex("user_deck_unique").on(table.userId, table.deckId)],
 );

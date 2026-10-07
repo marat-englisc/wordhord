@@ -7,7 +7,7 @@ bot.command("start", async (ctx) => {
   if (!ctx.from) {
     return;
   }
-  const telegramId = BigInt(ctx.from.id);
+  const telegramId = ctx.from.id;
   const username = ctx.from.username || null;
   const firstName = ctx.from.first_name || null;
   const lastName = ctx.from.last_name || null;
@@ -29,7 +29,6 @@ bot.command("start", async (ctx) => {
     firstName: firstName,
     lastName: lastName,
     isAdmin: false,
-    updatedAt: new Date(),
   });
 
   await ctx.reply(`Привет, ${firstName}! Ты зарегистрирован.`);

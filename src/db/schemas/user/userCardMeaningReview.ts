@@ -1,19 +1,12 @@
-import {
-  index,
-  integer,
-  pgTable,
-  real,
-  smallint,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { index, integer, sqliteTable, real } from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
 import { userCardMeaningTable } from "./userCardMeaning";
 import { cardMeaningTable } from "../card/cardMeaning";
 
-export const userCardMeaningReviewTable = pgTable(
+export const userCardMeaningReviewTable = sqliteTable(
   "user_card_meaning_review",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     userId: integer("user_id")
       .notNull()
@@ -33,13 +26,11 @@ export const userCardMeaningReviewTable = pgTable(
         onDelete: "cascade",
       }),
 
-    rating: smallint("rating").notNull(),
+    rating: integer("rating").notNull(),
 
-    state: smallint("state").notNull(),
+    state: integer("state").notNull(),
 
-    due: timestamp("due", {
-      withTimezone: true,
-    }).notNull(),
+    due: integer("due", { mode: "timestamp_ms" }).notNull(),
 
     stability: real("stability").notNull(),
 
@@ -49,9 +40,7 @@ export const userCardMeaningReviewTable = pgTable(
 
     elapsedDays: integer("elapsed_days").notNull(),
 
-    review: timestamp("review", {
-      withTimezone: true,
-    }).notNull(),
+    review: integer("review", { mode: "timestamp_ms" }).notNull(),
   },
   (table) => [
     index("user_card_meaning_reviews_user_idx").on(table.userId, table.review),

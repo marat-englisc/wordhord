@@ -1,10 +1,11 @@
-import { index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { cardTable } from "./card";
 
-export const cardMeaningTable = pgTable(
+export const cardMeaningTable = sqliteTable(
   "card_meaning",
   {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
 
     cardId: integer("card_id")
       .notNull()
@@ -18,15 +19,11 @@ export const cardMeaningTable = pgTable(
 
     meaningTranslation: text("meaning_translation").notNull(),
 
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-    })
+    createdAt: text("created_at")
       .notNull()
-      .defaultNow(),
+      .default(sql`(CURRENT_TIMESTAMP)`),
 
-    updatedAt: timestamp("updated_at", {
-      withTimezone: true,
-    }).notNull(),
+    updatedAt: text("updated_at").notNull(),
   },
   (table) => [index("card_meanings_card_id_index").on(table.cardId)],
 );
