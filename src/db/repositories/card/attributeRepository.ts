@@ -6,7 +6,7 @@ import {
   type PaginationOptions,
 } from "../queryUtils";
 import { attributeTable } from "../../schemas/card/attribute";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
 
 export type Attribute = typeof attributeTable.$inferSelect;
 export type NewAttribute = Omit<
@@ -34,93 +34,58 @@ function getAttributeConditions(filters: AttributeFilters) {
 }
 
 export async function getAttributeById(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(attributeTable)
-      .where(eq(attributeTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching attribute by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(attributeTable)
+    .where(eq(attributeTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getAttributes(options: AttributeQuery = {}) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(attributeTable)
-      .where(getAttributeConditions(options))
-      .orderBy(asc(attributeTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching Attributes:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(attributeTable)
+    .where(getAttributeConditions(options))
+    .orderBy(asc(attributeTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countAttributes(filters: AttributeFilters = {}) {
-  try {
-    return await db.$count(attributeTable, getAttributeConditions(filters));
-  } catch (error) {
-    console.error("Error counting Attributes:", error);
-    throw error;
-  }
+  return await getDatabase().$count(attributeTable, getAttributeConditions(filters));
 }
 
 export async function createAttribute(data: NewAttribute): Promise<Attribute> {
-  try {
-    const rows = await db.insert(attributeTable).values(data).returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating attribute:", error);
-    throw error;
-  }
+  const rows = await getDatabase().insert(attributeTable).values(data).returning();
+  return rows[0]!;
 }
 
 export async function createAttributes(
   data: NewAttribute[],
 ): Promise<Attribute[]> {
-  try {
-    return db.transaction((tx) =>
-      data.map(
-        (item) => tx.insert(attributeTable).values(item).returning().get()!,
-      ),
-    );
-  } catch (error) {
-    console.error("Error creating Attributes:", error);
-    throw error;
-  }
+  return getDatabase().transaction((tx) =>
+    data.map(
+      (item) => tx.insert(attributeTable).values(item).returning().get()!,
+    ),
+  );
 }
 
 export async function updateAttribute(id: number, data: UpdateAttribute) {
-  try {
-    validateUpdate(data);
-    const rows = await db
-      .update(attributeTable)
-      .set(data)
-      .where(eq(attributeTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating attribute:", error);
-    throw error;
-  }
+  validateUpdate(data);
+  const rows = await getDatabase()
+    .update(attributeTable)
+    .set(data)
+    .where(eq(attributeTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function deleteAttribute(id: number) {
-  try {
-    const rows = await db
-      .delete(attributeTable)
-      .where(eq(attributeTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting attribute:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(attributeTable)
+    .where(eq(attributeTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }

@@ -186,19 +186,28 @@ export function getProgressVersion(
     .slice(0, 32);
 }
 
-function mapResult(result: RecordLogItem): ScheduledReview {
+function mapResult(result: RecordLogItem, maximumInterval: number): ScheduledReview {
   const { card, log } = result;
   validateDate(card.due, "next due");
   validateDate(card.last_review!, "last review");
   validateDate(log.due, "log due");
   validateDate(log.review, "log review");
+  // TS-FSRS can add one/two days after applying its interval ceiling to keep
+  // Hard/Good/Easy ordered. The application's ceiling applies to the final
+  // schedule; at the ceiling equal intervals are allowed. Memory and the log
+  // describing the previous card remain exactly as calculated by TS-FSRS.
+  const scheduledDays = Math.min(card.scheduled_days, maximumInterval);
+  const due = scheduledDays === card.scheduled_days
+    ? new Date(card.due)
+    : new Date(card.last_review!.getTime() + scheduledDays * DAY_MS);
+  validateDate(due, "next due");
   return {
     progress: {
-      due: new Date(card.due),
+      due,
       stability: card.stability,
       difficulty: card.difficulty,
       elapsedDays: card.elapsed_days,
-      scheduledDays: card.scheduled_days,
+      scheduledDays,
       learningSteps: card.learning_steps,
       reps: card.reps,
       lapses: card.lapses,
@@ -270,6 +279,7 @@ export function createFsrsEngine(settings: Partial<FSRSParameters> = {}) {
       validateGrade(rating);
       return mapResult(
         scheduler.next(input(progress, now, seed), new Date(now), rating),
+        scheduler.parameters.maximum_interval,
       );
     },
     preview(progress: UserCardMeaning | null, now: Date, seed = "study:") {
@@ -278,7 +288,9 @@ export function createFsrsEngine(settings: Partial<FSRSParameters> = {}) {
         new Date(now),
       );
       const outcomes = {} as Record<Grade, ScheduledReview>;
-      for (const grade of Grades) outcomes[grade] = mapResult(results[grade]);
+      for (const grade of Grades) {
+        outcomes[grade] = mapResult(results[grade], scheduler.parameters.maximum_interval);
+      }
       return outcomes;
     },
     retrievability(progress: UserCardMeaning, now: Date): number | null {

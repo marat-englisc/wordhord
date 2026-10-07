@@ -13,7 +13,11 @@ import { cardMeaningTable } from "../../schemas/card/cardMeaning";
 import { cardTable } from "../../schemas/card/card";
 import type { State } from "ts-fsrs";
 import { userCardMeaningTable } from "../../schemas/user/userCardMeaning";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
+import {
+  mergeDefinedValues,
+  validateProgressWrite,
+} from "../persistenceValidation";
 import {
   getPagination,
   validateUpdate,
@@ -60,168 +64,137 @@ function getUserCardMeaningConditions(filters: UserCardMeaningFilters) {
 }
 
 export async function getUserCardMeaningById(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userCardMeaningTable)
-      .where(eq(userCardMeaningTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching userCardMeaning by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userCardMeaningTable)
+    .where(eq(userCardMeaningTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getUserCardMeanings(options: UserCardMeaningQuery = {}) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(userCardMeaningTable)
-      .where(getUserCardMeaningConditions(options))
-      .orderBy(asc(userCardMeaningTable.due), asc(userCardMeaningTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching UserCardMeanings:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(userCardMeaningTable)
+    .where(getUserCardMeaningConditions(options))
+    .orderBy(asc(userCardMeaningTable.due), asc(userCardMeaningTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countUserCardMeanings(
   filters: UserCardMeaningFilters = {},
 ) {
-  try {
-    return await db.$count(
-      userCardMeaningTable,
-      getUserCardMeaningConditions(filters),
-    );
-  } catch (error) {
-    console.error("Error counting UserCardMeanings:", error);
-    throw error;
-  }
+  return await getDatabase().$count(
+    userCardMeaningTable,
+    getUserCardMeaningConditions(filters),
+  );
 }
 
 export async function createUserCardMeaning(
   data: NewUserCardMeaning,
 ): Promise<UserCardMeaning> {
-  try {
-    const rows = await db.insert(userCardMeaningTable).values(data).returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating userCardMeaning:", error);
-    throw error;
-  }
+  validateProgressWrite(data);
+  const rows = await getDatabase()
+    .insert(userCardMeaningTable)
+    .values(data)
+    .returning();
+  return rows[0]!;
 }
 
 export async function updateUserCardMeaning(
   id: number,
   data: UpdateUserCardMeaning,
 ) {
-  try {
-    validateUpdate(data, ["userId", "cardMeaningId"]);
-    const rows = await db
+  validateUpdate(data, ["userId", "cardMeaningId"]);
+  return getDatabase().transaction((tx) => {
+    const existing = tx
+      .select()
+      .from(userCardMeaningTable)
+      .where(eq(userCardMeaningTable.id, id))
+      .get();
+    if (!existing) return null;
+    validateProgressWrite(mergeDefinedValues(existing, data));
+    return tx
       .update(userCardMeaningTable)
       .set(data)
       .where(eq(userCardMeaningTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating userCardMeaning:", error);
-    throw error;
-  }
+      .returning()
+      .get()!;
+  }, { behavior: "immediate" });
 }
 
 export async function deleteUserCardMeaning(id: number) {
-  try {
-    const rows = await db
-      .delete(userCardMeaningTable)
-      .where(eq(userCardMeaningTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting userCardMeaning:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userCardMeaningTable)
+    .where(eq(userCardMeaningTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function getUserCardMeaningByUserAndCardMeaning(
   userId: number,
   cardMeaningId: number,
 ) {
-  try {
-    const rows = await db
-      .select()
-      .from(userCardMeaningTable)
-      .where(
-        and(
-          eq(userCardMeaningTable.userId, userId),
-          eq(userCardMeaningTable.cardMeaningId, cardMeaningId),
-        ),
-      )
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching userCardMeaning by relation:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userCardMeaningTable)
+    .where(
+      and(
+        eq(userCardMeaningTable.userId, userId),
+        eq(userCardMeaningTable.cardMeaningId, cardMeaningId),
+      ),
+    )
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getOrCreateUserCardMeaning(
   data: NewUserCardMeaning,
 ): Promise<UserCardMeaning> {
-  try {
-    return db.transaction((tx) => {
-      const inserted = tx
-        .insert(userCardMeaningTable)
-        .values(data)
-        .onConflictDoNothing({
-          target: [
-            userCardMeaningTable.userId,
-            userCardMeaningTable.cardMeaningId,
-          ],
-        })
-        .returning()
-        .get();
-      if (inserted) return inserted;
+  validateProgressWrite(data);
+  return getDatabase().transaction((tx) => {
+    const inserted = tx
+      .insert(userCardMeaningTable)
+      .values(data)
+      .onConflictDoNothing({
+        target: [
+          userCardMeaningTable.userId,
+          userCardMeaningTable.cardMeaningId,
+        ],
+      })
+      .returning()
+      .get();
+    if (inserted) return inserted;
 
-      return tx
-        .select()
-        .from(userCardMeaningTable)
-        .where(
-          and(
-            eq(userCardMeaningTable.userId, data.userId),
-            eq(userCardMeaningTable.cardMeaningId, data.cardMeaningId),
-          ),
-        )
-        .get()!;
-    });
-  } catch (error) {
-    console.error("Error getting or creating userCardMeaning:", error);
-    throw error;
-  }
+    return tx
+      .select()
+      .from(userCardMeaningTable)
+      .where(
+        and(
+          eq(userCardMeaningTable.userId, data.userId),
+          eq(userCardMeaningTable.cardMeaningId, data.cardMeaningId),
+        ),
+      )
+      .get()!;
+  });
 }
 
 export async function deleteUserCardMeaningByUserAndCardMeaning(
   userId: number,
   cardMeaningId: number,
 ) {
-  try {
-    const rows = await db
-      .delete(userCardMeaningTable)
-      .where(
-        and(
-          eq(userCardMeaningTable.userId, userId),
-          eq(userCardMeaningTable.cardMeaningId, cardMeaningId),
-        ),
-      )
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting userCardMeaning by relation:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userCardMeaningTable)
+    .where(
+      and(
+        eq(userCardMeaningTable.userId, userId),
+        eq(userCardMeaningTable.cardMeaningId, cardMeaningId),
+      ),
+    )
+    .returning();
+  return rows[0] ?? null;
 }
 
 export type DueUserCardMeaningQuery = PaginationOptions & {
@@ -234,35 +207,30 @@ export async function getDueUserCardMeanings(
   dueBefore: Date = new Date(),
   options: DueUserCardMeaningQuery = {},
 ) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select(getColumns(userCardMeaningTable))
-      .from(userCardMeaningTable)
-      .innerJoin(
-        cardMeaningTable,
-        eq(userCardMeaningTable.cardMeaningId, cardMeaningTable.id),
-      )
-      .innerJoin(cardTable, eq(cardMeaningTable.cardId, cardTable.id))
-      .where(
-        and(
-          eq(userCardMeaningTable.userId, userId),
-          lte(userCardMeaningTable.due, dueBefore),
-          options.deckId !== undefined
-            ? eq(cardTable.deckId, options.deckId)
-            : undefined,
-          options.state !== undefined
-            ? eq(userCardMeaningTable.state, options.state)
-            : undefined,
-        ),
-      )
-      .orderBy(asc(userCardMeaningTable.due), asc(userCardMeaningTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching due user card meanings:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select(getColumns(userCardMeaningTable))
+    .from(userCardMeaningTable)
+    .innerJoin(
+      cardMeaningTable,
+      eq(userCardMeaningTable.cardMeaningId, cardMeaningTable.id),
+    )
+    .innerJoin(cardTable, eq(cardMeaningTable.cardId, cardTable.id))
+    .where(
+      and(
+        eq(userCardMeaningTable.userId, userId),
+        lte(userCardMeaningTable.due, dueBefore),
+        options.deckId !== undefined
+          ? eq(cardTable.deckId, options.deckId)
+          : undefined,
+        options.state !== undefined
+          ? eq(userCardMeaningTable.state, options.state)
+          : undefined,
+      ),
+    )
+    .orderBy(asc(userCardMeaningTable.due), asc(userCardMeaningTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function getUnstudiedCardMeanings(
@@ -270,56 +238,46 @@ export async function getUnstudiedCardMeanings(
   deckId: number,
   options: PaginationOptions = {},
 ) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select(getColumns(cardMeaningTable))
-      .from(cardMeaningTable)
-      .innerJoin(cardTable, eq(cardMeaningTable.cardId, cardTable.id))
-      .where(
-        and(
-          eq(cardTable.deckId, deckId),
-          notExists(
-            db
-              .select({ id: userCardMeaningTable.id })
-              .from(userCardMeaningTable)
-              .where(
-                and(
-                  eq(userCardMeaningTable.userId, userId),
-                  eq(userCardMeaningTable.cardMeaningId, cardMeaningTable.id),
-                ),
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select(getColumns(cardMeaningTable))
+    .from(cardMeaningTable)
+    .innerJoin(cardTable, eq(cardMeaningTable.cardId, cardTable.id))
+    .where(
+      and(
+        eq(cardTable.deckId, deckId),
+        notExists(
+          getDatabase()
+            .select({ id: userCardMeaningTable.id })
+            .from(userCardMeaningTable)
+            .where(
+              and(
+                eq(userCardMeaningTable.userId, userId),
+                eq(userCardMeaningTable.cardMeaningId, cardMeaningTable.id),
               ),
-          ),
+            ),
         ),
-      )
-      .orderBy(asc(cardMeaningTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching unstudied card meanings:", error);
-    throw error;
-  }
+      ),
+    )
+    .orderBy(asc(cardMeaningTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function getUserCardMeaningStatistics(
   userId: number,
   asOf: Date = new Date(),
 ) {
-  try {
-    return await db
-      .select({
-        state: userCardMeaningTable.state,
-        total: count(),
-        due: sql<number>`sum(case when ${lte(userCardMeaningTable.due, asOf)} then 1 else 0 end)`.mapWith(
-          Number,
-        ),
-      })
-      .from(userCardMeaningTable)
-      .where(eq(userCardMeaningTable.userId, userId))
-      .groupBy(userCardMeaningTable.state)
-      .orderBy(asc(userCardMeaningTable.state));
-  } catch (error) {
-    console.error("Error fetching user card meaning statistics:", error);
-    throw error;
-  }
+  return await getDatabase()
+    .select({
+      state: userCardMeaningTable.state,
+      total: count(),
+      due: sql<number>`sum(case when ${lte(userCardMeaningTable.due, asOf)} then 1 else 0 end)`.mapWith(
+        Number,
+      ),
+    })
+    .from(userCardMeaningTable)
+    .where(eq(userCardMeaningTable.userId, userId))
+    .groupBy(userCardMeaningTable.state)
+    .orderBy(asc(userCardMeaningTable.state));
 }

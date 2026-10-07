@@ -1,41 +1,22 @@
-import { bot } from "./config/bot";
-import { db } from "./config/db";
-import { eq } from "drizzle-orm";
-import { userTable } from "./db/schemas/user/user";
+import { createBot } from "./config/bot";
+import { getDatabase, closeDatabase } from "./config/db";
+import { registerHandlers } from "./bot/handlers";
+import { runBot } from "./bot/lifecycle";
 
-bot.command("start", async (ctx) => {
-  if (!ctx.from) {
-    return;
+export async function main(): Promise<void> {
+  const bot = createBot();
+  try {
+    getDatabase();
+    registerHandlers(bot);
+    await runBot(bot, closeDatabase);
+  } finally {
+    closeDatabase();
   }
-  const telegramId = ctx.from.id;
-  const username = ctx.from.username || null;
-  const firstName = ctx.from.first_name || null;
-  const lastName = ctx.from.last_name || null;
+}
 
-  const existingUser = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.telegramId, telegramId))
-    .limit(1);
-
-  if (existingUser.length > 0) {
-    await ctx.reply(`С возвращением, ${firstName}!`);
-    return;
-  }
-
-  await db.insert(userTable).values({
-    telegramId,
-    username: username,
-    firstName: firstName,
-    lastName: lastName,
-    isAdmin: false,
+if (require.main === module) {
+  main().catch((error: unknown) => {
+    console.error("Bot startup failed:", error instanceof Error ? error.message : error);
+    process.exitCode = 1;
   });
-
-  await ctx.reply(`Привет, ${firstName}! Ты зарегистрирован.`);
-});
-
-bot.on("message", (ctx) => {
-  ctx.reply("Got another message!");
-});
-
-bot.start();
+}

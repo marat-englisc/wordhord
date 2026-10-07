@@ -1,6 +1,6 @@
 import { and, asc, eq, or } from "drizzle-orm";
 import { userTable } from "../../schemas/user/user";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
 import {
   containsText,
   getPagination,
@@ -46,134 +46,89 @@ function getUserConditions(filters: UserFilters) {
 }
 
 export async function getUserById(telegramId: number) {
-  try {
-    const user = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.telegramId, telegramId))
-      .limit(1)
-      .then((result) => result[0]);
+  const user = await getDatabase()
+    .select()
+    .from(userTable)
+    .where(eq(userTable.telegramId, telegramId))
+    .limit(1)
+    .then((result) => result[0]);
 
-    return user || null;
-  } catch (error) {
-    console.error("Error fetching user by ID:", error);
-    throw error;
-  }
+  return user || null;
 }
 
 export async function getUserByTelegramId(telegramId: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.telegramId, telegramId))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching user by Telegram ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userTable)
+    .where(eq(userTable.telegramId, telegramId))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getUserByDatabaseId(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching user by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userTable)
+    .where(eq(userTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getUsers(options: UserQuery = {}) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(userTable)
-      .where(getUserConditions(options))
-      .orderBy(asc(userTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching Users:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(userTable)
+    .where(getUserConditions(options))
+    .orderBy(asc(userTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countUsers(filters: UserFilters = {}) {
-  try {
-    return await db.$count(userTable, getUserConditions(filters));
-  } catch (error) {
-    console.error("Error counting Users:", error);
-    throw error;
-  }
+  return await getDatabase().$count(userTable, getUserConditions(filters));
 }
 
 export async function createUser(data: NewUser): Promise<User> {
-  try {
-    const rows = await db.insert(userTable).values(data).returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
-  }
+  const rows = await getDatabase().insert(userTable).values(data).returning();
+  return rows[0]!;
 }
 
 export async function updateUser(id: number, data: UpdateUser) {
-  try {
-    validateUpdate(data, ["telegramId"]);
-    const rows = await db
-      .update(userTable)
-      .set(data)
-      .where(eq(userTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating user:", error);
-    throw error;
-  }
+  validateUpdate(data, ["telegramId"]);
+  const rows = await getDatabase()
+    .update(userTable)
+    .set(data)
+    .where(eq(userTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function deleteUser(id: number) {
-  try {
-    const rows = await db
-      .delete(userTable)
-      .where(eq(userTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userTable)
+    .where(eq(userTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function getOrCreateUser(data: NewUser) {
-  try {
-    return db.transaction((tx) => {
-      const inserted = tx
-        .insert(userTable)
-        .values(data)
-        .onConflictDoNothing({
-          target: userTable.telegramId,
-        })
-        .returning()
-        .get();
-      if (inserted) return { user: inserted, created: true };
+  return getDatabase().transaction((tx) => {
+    const inserted = tx
+      .insert(userTable)
+      .values(data)
+      .onConflictDoNothing({
+        target: userTable.telegramId,
+      })
+      .returning()
+      .get();
+    if (inserted) return { user: inserted, created: true };
 
-      const user = tx
-        .select()
-        .from(userTable)
-        .where(eq(userTable.telegramId, data.telegramId))
-        .get()!;
-      return { user, created: false };
-    });
-  } catch (error) {
-    console.error("Error getting or creating user:", error);
-    throw error;
-  }
+    const user = tx
+      .select()
+      .from(userTable)
+      .where(eq(userTable.telegramId, data.telegramId))
+      .get()!;
+    return { user, created: false };
+  });
 }

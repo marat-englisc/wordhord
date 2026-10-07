@@ -40,5 +40,16 @@ export function validateUpdate(
 }
 
 export function containsText(column: AnySQLiteColumn, value: string) {
-  return sql`instr(lower(${column}), lower(${value})) > 0`;
+  return sql`instr(normalize_search(${column}), normalize_search(${value})) > 0`;
+}
+
+export function groupBy<T, K>(items: readonly T[], keyOf: (item: T) => K): Map<K, T[]> {
+  const groups = new Map<K, T[]>();
+  for (const item of items) {
+    const key = keyOf(item);
+    const group = groups.get(key);
+    if (group) group.push(item);
+    else groups.set(key, [item]);
+  }
+  return groups;
 }

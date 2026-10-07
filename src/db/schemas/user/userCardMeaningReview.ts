@@ -43,6 +43,11 @@ export const userCardMeaningReviewTable = sqliteTable(
   },
   (table) => [
     index("user_card_meaning_reviews_user_idx").on(table.userId, table.review),
+    index("user_card_meaning_reviews_user_state_idx").on(
+      table.userId,
+      table.state,
+      table.review,
+    ),
     index("user_card_meaning_reviews_progress_idx").on(
       table.userCardMeaningId,
       table.review,
@@ -67,7 +72,7 @@ export const userCardMeaningReviewTable = sqliteTable(
     ),
     check(
       "user_card_meaning_review_stability_check",
-      sql`typeof(${table.stability}) IN ('integer', 'real') AND ${table.stability} >= 0`,
+      sql`typeof(${table.stability}) IN ('integer', 'real') AND ${table.stability} BETWEEN 0 AND 1.7976931348623157e308`,
     ),
     check(
       "user_card_meaning_review_difficulty_check",
@@ -75,10 +80,15 @@ export const userCardMeaningReviewTable = sqliteTable(
     ),
     check(
       "user_card_meaning_review_counters_check",
-      sql`typeof(${table.elapsedDays}) = 'integer' AND ${table.elapsedDays} >= 0
-        AND typeof(${table.scheduledDays}) = 'integer' AND ${table.scheduledDays} >= 0
-        AND typeof(${table.lastElapsedDays}) = 'integer' AND ${table.lastElapsedDays} >= 0
-        AND typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} >= 0`,
+      sql`typeof(${table.elapsedDays}) = 'integer' AND ${table.elapsedDays} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.scheduledDays}) = 'integer' AND ${table.scheduledDays} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.lastElapsedDays}) = 'integer' AND ${table.lastElapsedDays} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} BETWEEN 0 AND 9007199254740991`,
+    ),
+    check(
+      "user_card_meaning_review_dates_check",
+      sql`typeof(${table.due}) = 'integer' AND ${table.due} BETWEEN -8640000000000000 AND 8640000000000000
+        AND typeof(${table.review}) = 'integer' AND ${table.review} BETWEEN -8640000000000000 AND 8640000000000000`,
     ),
   ],
 );

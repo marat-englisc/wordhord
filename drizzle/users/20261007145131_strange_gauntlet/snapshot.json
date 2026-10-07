@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "8b04f6f8-c6db-48ea-8a51-082d801951ac",
+  "id": "c9de23c3-d4b7-4b5e-9553-c0f2c8162852",
   "prevIds": [
-    "409ba50d-90ee-44d0-8c4f-d3688590f5b6"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -734,6 +734,28 @@
     {
       "columns": [
         {
+          "value": "user_id",
+          "isExpression": false
+        },
+        {
+          "value": "state",
+          "isExpression": false
+        },
+        {
+          "value": "review",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_card_meaning_reviews_user_state_idx",
+      "entityType": "indexes",
+      "table": "user_card_meaning_review"
+    },
+    {
+      "columns": [
+        {
           "value": "user_card_meaning_id",
           "isExpression": false
         },
@@ -872,7 +894,7 @@
       "table": "user_card_meaning"
     },
     {
-      "value": "typeof(\"stability\") IN ('integer', 'real') AND \"stability\" >= 0",
+      "value": "typeof(\"stability\") IN ('integer', 'real') AND \"stability\" BETWEEN 0 AND 1.7976931348623157e308",
       "name": "user_card_meaning_stability_check",
       "entityType": "checks",
       "table": "user_card_meaning"
@@ -884,8 +906,14 @@
       "table": "user_card_meaning"
     },
     {
-      "value": "typeof(\"elapsed_days\") = 'integer' AND \"elapsed_days\" >= 0\n        AND typeof(\"scheduled_days\") = 'integer' AND \"scheduled_days\" >= 0\n        AND typeof(\"learning_steps\") = 'integer' AND \"learning_steps\" >= 0\n        AND typeof(\"reps\") = 'integer' AND \"reps\" >= 0\n        AND typeof(\"lapses\") = 'integer' AND \"lapses\" >= 0",
+      "value": "typeof(\"elapsed_days\") = 'integer' AND \"elapsed_days\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"scheduled_days\") = 'integer' AND \"scheduled_days\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"learning_steps\") = 'integer' AND \"learning_steps\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"reps\") = 'integer' AND \"reps\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"lapses\") = 'integer' AND \"lapses\" BETWEEN 0 AND 9007199254740991",
       "name": "user_card_meaning_counters_check",
+      "entityType": "checks",
+      "table": "user_card_meaning"
+    },
+    {
+      "value": "typeof(\"due\") = 'integer' AND \"due\" BETWEEN -8640000000000000 AND 8640000000000000\n        AND (\"last_review\" IS NULL OR (typeof(\"last_review\") = 'integer'\n          AND \"last_review\" BETWEEN -8640000000000000 AND 8640000000000000))",
+      "name": "user_card_meaning_dates_check",
       "entityType": "checks",
       "table": "user_card_meaning"
     },
@@ -902,7 +930,7 @@
       "table": "user_card_meaning_review"
     },
     {
-      "value": "typeof(\"stability\") IN ('integer', 'real') AND \"stability\" >= 0",
+      "value": "typeof(\"stability\") IN ('integer', 'real') AND \"stability\" BETWEEN 0 AND 1.7976931348623157e308",
       "name": "user_card_meaning_review_stability_check",
       "entityType": "checks",
       "table": "user_card_meaning_review"
@@ -914,10 +942,22 @@
       "table": "user_card_meaning_review"
     },
     {
-      "value": "typeof(\"elapsed_days\") = 'integer' AND \"elapsed_days\" >= 0\n        AND typeof(\"scheduled_days\") = 'integer' AND \"scheduled_days\" >= 0\n        AND typeof(\"last_elapsed_days\") = 'integer' AND \"last_elapsed_days\" >= 0\n        AND typeof(\"learning_steps\") = 'integer' AND \"learning_steps\" >= 0",
+      "value": "typeof(\"elapsed_days\") = 'integer' AND \"elapsed_days\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"scheduled_days\") = 'integer' AND \"scheduled_days\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"last_elapsed_days\") = 'integer' AND \"last_elapsed_days\" BETWEEN 0 AND 9007199254740991\n        AND typeof(\"learning_steps\") = 'integer' AND \"learning_steps\" BETWEEN 0 AND 9007199254740991",
       "name": "user_card_meaning_review_counters_check",
       "entityType": "checks",
       "table": "user_card_meaning_review"
+    },
+    {
+      "value": "typeof(\"due\") = 'integer' AND \"due\" BETWEEN -8640000000000000 AND 8640000000000000\n        AND typeof(\"review\") = 'integer' AND \"review\" BETWEEN -8640000000000000 AND 8640000000000000",
+      "name": "user_card_meaning_review_dates_check",
+      "entityType": "checks",
+      "table": "user_card_meaning_review"
+    },
+    {
+      "value": "\"last_reviewed_at\" IS NULL OR (typeof(\"last_reviewed_at\") = 'integer'\n        AND \"last_reviewed_at\" BETWEEN -8640000000000000 AND 8640000000000000)",
+      "name": "user_deck_last_reviewed_at_check",
+      "entityType": "checks",
+      "table": "user_deck"
     }
   ],
   "renames": []

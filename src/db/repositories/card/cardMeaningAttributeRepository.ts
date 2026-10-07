@@ -1,6 +1,6 @@
 import { and, asc, eq } from "drizzle-orm";
 import { cardMeaningAttributeTable } from "../../schemas/card/cardMeaningAttribute";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
 import {
   getPagination,
   validateUpdate,
@@ -41,111 +41,76 @@ function getCardMeaningAttributeConditions(
 }
 
 export async function getCardMeaningAttributeById(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(cardMeaningAttributeTable)
-      .where(eq(cardMeaningAttributeTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching cardMeaningAttribute by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(cardMeaningAttributeTable)
+    .where(eq(cardMeaningAttributeTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getCardMeaningAttributes(
   options: CardMeaningAttributeQuery = {},
 ) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(cardMeaningAttributeTable)
-      .where(getCardMeaningAttributeConditions(options))
-      .orderBy(asc(cardMeaningAttributeTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching CardMeaningAttributes:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(cardMeaningAttributeTable)
+    .where(getCardMeaningAttributeConditions(options))
+    .orderBy(asc(cardMeaningAttributeTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countCardMeaningAttributes(
   filters: CardMeaningAttributeFilters = {},
 ) {
-  try {
-    return await db.$count(
-      cardMeaningAttributeTable,
-      getCardMeaningAttributeConditions(filters),
-    );
-  } catch (error) {
-    console.error("Error counting CardMeaningAttributes:", error);
-    throw error;
-  }
+  return await getDatabase().$count(
+    cardMeaningAttributeTable,
+    getCardMeaningAttributeConditions(filters),
+  );
 }
 
 export async function createCardMeaningAttribute(
   data: NewCardMeaningAttribute,
 ): Promise<CardMeaningAttribute> {
-  try {
-    const rows = await db
-      .insert(cardMeaningAttributeTable)
-      .values(data)
-      .returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating cardMeaningAttribute:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .insert(cardMeaningAttributeTable)
+    .values(data)
+    .returning();
+  return rows[0]!;
 }
 
 export async function createCardMeaningAttributes(
   data: NewCardMeaningAttribute[],
 ): Promise<CardMeaningAttribute[]> {
-  try {
-    return db.transaction((tx) =>
-      data.map(
-        (item) =>
-          tx.insert(cardMeaningAttributeTable).values(item).returning().get()!,
-      ),
-    );
-  } catch (error) {
-    console.error("Error creating CardMeaningAttributes:", error);
-    throw error;
-  }
+  return getDatabase().transaction((tx) =>
+    data.map(
+      (item) =>
+        tx.insert(cardMeaningAttributeTable).values(item).returning().get()!,
+    ),
+  );
 }
 
 export async function updateCardMeaningAttribute(
   id: number,
   data: UpdateCardMeaningAttribute,
 ) {
-  try {
-    validateUpdate(data);
-    const rows = await db
-      .update(cardMeaningAttributeTable)
-      .set(data)
-      .where(eq(cardMeaningAttributeTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating cardMeaningAttribute:", error);
-    throw error;
-  }
+  validateUpdate(data);
+  const rows = await getDatabase()
+    .update(cardMeaningAttributeTable)
+    .set(data)
+    .where(eq(cardMeaningAttributeTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function deleteCardMeaningAttribute(id: number) {
-  try {
-    const rows = await db
-      .delete(cardMeaningAttributeTable)
-      .where(eq(cardMeaningAttributeTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting cardMeaningAttribute:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(cardMeaningAttributeTable)
+    .where(eq(cardMeaningAttributeTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function getCardMeaningAttributeByValue(
@@ -153,58 +118,48 @@ export async function getCardMeaningAttributeByValue(
   attributeId: number,
   value: string,
 ) {
-  try {
-    const rows = await db
-      .select()
-      .from(cardMeaningAttributeTable)
-      .where(
-        and(
-          eq(cardMeaningAttributeTable.cardMeaningId, cardMeaningId),
-          eq(cardMeaningAttributeTable.attributeId, attributeId),
-          eq(cardMeaningAttributeTable.value, value),
-        ),
-      )
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching card meaning attribute by value:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(cardMeaningAttributeTable)
+    .where(
+      and(
+        eq(cardMeaningAttributeTable.cardMeaningId, cardMeaningId),
+        eq(cardMeaningAttributeTable.attributeId, attributeId),
+        eq(cardMeaningAttributeTable.value, value),
+      ),
+    )
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getOrCreateCardMeaningAttribute(
   data: NewCardMeaningAttribute,
 ): Promise<CardMeaningAttribute> {
-  try {
-    return db.transaction((tx) => {
-      const inserted = tx
-        .insert(cardMeaningAttributeTable)
-        .values(data)
-        .onConflictDoNothing({
-          target: [
-            cardMeaningAttributeTable.cardMeaningId,
-            cardMeaningAttributeTable.attributeId,
-            cardMeaningAttributeTable.value,
-          ],
-        })
-        .returning()
-        .get();
-      if (inserted) return inserted;
+  return getDatabase().transaction((tx) => {
+    const inserted = tx
+      .insert(cardMeaningAttributeTable)
+      .values(data)
+      .onConflictDoNothing({
+        target: [
+          cardMeaningAttributeTable.cardMeaningId,
+          cardMeaningAttributeTable.attributeId,
+          cardMeaningAttributeTable.value,
+        ],
+      })
+      .returning()
+      .get();
+    if (inserted) return inserted;
 
-      return tx
-        .select()
-        .from(cardMeaningAttributeTable)
-        .where(
-          and(
-            eq(cardMeaningAttributeTable.cardMeaningId, data.cardMeaningId),
-            eq(cardMeaningAttributeTable.attributeId, data.attributeId),
-            eq(cardMeaningAttributeTable.value, data.value),
-          ),
-        )
-        .get()!;
-    });
-  } catch (error) {
-    console.error("Error getting or creating cardMeaningAttribute:", error);
-    throw error;
-  }
+    return tx
+      .select()
+      .from(cardMeaningAttributeTable)
+      .where(
+        and(
+          eq(cardMeaningAttributeTable.cardMeaningId, data.cardMeaningId),
+          eq(cardMeaningAttributeTable.attributeId, data.attributeId),
+          eq(cardMeaningAttributeTable.value, data.value),
+        ),
+      )
+      .get()!;
+  });
 }

@@ -26,13 +26,16 @@ CREATE TABLE `user_card_meaning` (
 	CONSTRAINT `fk_user_card_meaning_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
 	CONSTRAINT `user_card_meaning_identity_unique` UNIQUE(`id`,`user_id`,`card_meaning_id`),
 	CONSTRAINT "user_card_meaning_state_check" CHECK("state" IN (0, 1, 2, 3)),
-	CONSTRAINT "user_card_meaning_stability_check" CHECK(typeof("stability") IN ('integer', 'real') AND "stability" >= 0),
+	CONSTRAINT "user_card_meaning_stability_check" CHECK(typeof("stability") IN ('integer', 'real') AND "stability" BETWEEN 0 AND 1.7976931348623157e308),
 	CONSTRAINT "user_card_meaning_difficulty_check" CHECK(typeof("difficulty") IN ('integer', 'real') AND "difficulty" BETWEEN 0 AND 10),
-	CONSTRAINT "user_card_meaning_counters_check" CHECK(typeof("elapsed_days") = 'integer' AND "elapsed_days" >= 0
-        AND typeof("scheduled_days") = 'integer' AND "scheduled_days" >= 0
-        AND typeof("learning_steps") = 'integer' AND "learning_steps" >= 0
-        AND typeof("reps") = 'integer' AND "reps" >= 0
-        AND typeof("lapses") = 'integer' AND "lapses" >= 0)
+	CONSTRAINT "user_card_meaning_counters_check" CHECK(typeof("elapsed_days") = 'integer' AND "elapsed_days" BETWEEN 0 AND 9007199254740991
+        AND typeof("scheduled_days") = 'integer' AND "scheduled_days" BETWEEN 0 AND 9007199254740991
+        AND typeof("learning_steps") = 'integer' AND "learning_steps" BETWEEN 0 AND 9007199254740991
+        AND typeof("reps") = 'integer' AND "reps" BETWEEN 0 AND 9007199254740991
+        AND typeof("lapses") = 'integer' AND "lapses" BETWEEN 0 AND 9007199254740991),
+	CONSTRAINT "user_card_meaning_dates_check" CHECK(typeof("due") = 'integer' AND "due" BETWEEN -8640000000000000 AND 8640000000000000
+        AND ("last_review" IS NULL OR (typeof("last_review") = 'integer'
+          AND "last_review" BETWEEN -8640000000000000 AND 8640000000000000)))
 );
 --> statement-breakpoint
 CREATE TABLE `user_card_meaning_review` (
@@ -47,22 +50,20 @@ CREATE TABLE `user_card_meaning_review` (
 	`difficulty` real NOT NULL,
 	`scheduled_days` integer NOT NULL,
 	`elapsed_days` integer NOT NULL,
-	`last_elapsed_days` integer,
-	`learning_steps` integer,
+	`last_elapsed_days` integer NOT NULL,
+	`learning_steps` integer NOT NULL,
 	`review` integer NOT NULL,
 	CONSTRAINT `user_card_meaning_review_progress_fk` FOREIGN KEY (`user_card_meaning_id`,`user_id`,`card_meaning_id`) REFERENCES `user_card_meaning`(`id`,`user_id`,`card_meaning_id`) ON DELETE CASCADE,
 	CONSTRAINT "user_card_meaning_review_rating_check" CHECK("rating" IN (0, 1, 2, 3, 4)),
 	CONSTRAINT "user_card_meaning_review_state_check" CHECK("state" IN (0, 1, 2, 3)),
-	CONSTRAINT "user_card_meaning_review_stability_check" CHECK(typeof("stability") IN ('integer', 'real') AND "stability" >= 0),
+	CONSTRAINT "user_card_meaning_review_stability_check" CHECK(typeof("stability") IN ('integer', 'real') AND "stability" BETWEEN 0 AND 1.7976931348623157e308),
 	CONSTRAINT "user_card_meaning_review_difficulty_check" CHECK(typeof("difficulty") IN ('integer', 'real') AND "difficulty" BETWEEN 0 AND 10),
-	CONSTRAINT "user_card_meaning_review_counters_check" CHECK(typeof("elapsed_days") = 'integer' AND "elapsed_days" >= 0
-        AND typeof("scheduled_days") = 'integer' AND "scheduled_days" >= 0
-        AND ("last_elapsed_days" IS NULL OR (
-          typeof("last_elapsed_days") = 'integer' AND "last_elapsed_days" >= 0
-        ))
-        AND ("learning_steps" IS NULL OR (
-          typeof("learning_steps") = 'integer' AND "learning_steps" >= 0
-        )))
+	CONSTRAINT "user_card_meaning_review_counters_check" CHECK(typeof("elapsed_days") = 'integer' AND "elapsed_days" BETWEEN 0 AND 9007199254740991
+        AND typeof("scheduled_days") = 'integer' AND "scheduled_days" BETWEEN 0 AND 9007199254740991
+        AND typeof("last_elapsed_days") = 'integer' AND "last_elapsed_days" BETWEEN 0 AND 9007199254740991
+        AND typeof("learning_steps") = 'integer' AND "learning_steps" BETWEEN 0 AND 9007199254740991),
+	CONSTRAINT "user_card_meaning_review_dates_check" CHECK(typeof("due") = 'integer' AND "due" BETWEEN -8640000000000000 AND 8640000000000000
+        AND typeof("review") = 'integer' AND "review" BETWEEN -8640000000000000 AND 8640000000000000)
 );
 --> statement-breakpoint
 CREATE TABLE `user_deck` (
@@ -71,7 +72,9 @@ CREATE TABLE `user_deck` (
 	`deck_id` integer NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`last_reviewed_at` integer,
-	CONSTRAINT `fk_user_deck_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+	CONSTRAINT `fk_user_deck_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+	CONSTRAINT "user_deck_last_reviewed_at_check" CHECK("last_reviewed_at" IS NULL OR (typeof("last_reviewed_at") = 'integer'
+        AND "last_reviewed_at" BETWEEN -8640000000000000 AND 8640000000000000))
 );
 --> statement-breakpoint
 CREATE TABLE `user_rule` (
@@ -96,6 +99,7 @@ CREATE UNIQUE INDEX `user_card_meaning_unique` ON `user_card_meaning` (`user_id`
 CREATE INDEX `user_card_meanings_due_idx` ON `user_card_meaning` (`user_id`,`due`);--> statement-breakpoint
 CREATE INDEX `user_card_meanings_card_meaning_idx` ON `user_card_meaning` (`card_meaning_id`);--> statement-breakpoint
 CREATE INDEX `user_card_meaning_reviews_user_idx` ON `user_card_meaning_review` (`user_id`,`review`);--> statement-breakpoint
+CREATE INDEX `user_card_meaning_reviews_user_state_idx` ON `user_card_meaning_review` (`user_id`,`state`,`review`);--> statement-breakpoint
 CREATE INDEX `user_card_meaning_reviews_progress_idx` ON `user_card_meaning_review` (`user_card_meaning_id`,`review`);--> statement-breakpoint
 CREATE UNIQUE INDEX `user_deck_unique` ON `user_deck` (`user_id`,`deck_id`);--> statement-breakpoint
 CREATE INDEX `user_decks_deck_idx` ON `user_deck` (`deck_id`);--> statement-breakpoint

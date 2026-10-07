@@ -1,5 +1,6 @@
 import { Bot } from "grammy";
-import "dotenv/config";
-import { CONSTANTS } from "./constants";
+import { getTelegramToken } from "./constants";
 
-export const bot = new Bot(CONSTANTS.TELEGRAM_TOKEN);
+export function createBot(token = getTelegramToken()): Bot {
+  return new Bot(token);
+}

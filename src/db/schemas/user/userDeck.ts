@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  check,
   index,
   integer,
   sqliteTable,
@@ -30,5 +31,10 @@ export const userDeckTable = sqliteTable(
   (table) => [
     uniqueIndex("user_deck_unique").on(table.userId, table.deckId),
     index("user_decks_deck_idx").on(table.deckId),
+    check(
+      "user_deck_last_reviewed_at_check",
+      sql`${table.lastReviewedAt} IS NULL OR (typeof(${table.lastReviewedAt}) = 'integer'
+        AND ${table.lastReviewedAt} BETWEEN -8640000000000000 AND 8640000000000000)`,
+    ),
   ],
 );

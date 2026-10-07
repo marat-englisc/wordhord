@@ -1,7 +1,8 @@
 import { and, asc, eq, getColumns } from "drizzle-orm";
 import { deckTable } from "../../schemas/card/deck";
 import { userDeckTable } from "../../schemas/user/userDeck";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
+import { optionalDateWrite, validateDateWrite } from "../persistenceValidation";
 import {
   getPagination,
   validateUpdate,
@@ -34,169 +35,122 @@ function getUserDeckConditions(filters: UserDeckFilters) {
 }
 
 export async function getUserDeckById(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userDeckTable)
-      .where(eq(userDeckTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching userDeck by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userDeckTable)
+    .where(eq(userDeckTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getUserDecks(options: UserDeckQuery = {}) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(userDeckTable)
-      .where(getUserDeckConditions(options))
-      .orderBy(asc(userDeckTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching UserDecks:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(userDeckTable)
+    .where(getUserDeckConditions(options))
+    .orderBy(asc(userDeckTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countUserDecks(filters: UserDeckFilters = {}) {
-  try {
-    return await db.$count(userDeckTable, getUserDeckConditions(filters));
-  } catch (error) {
-    console.error("Error counting UserDecks:", error);
-    throw error;
-  }
+  return await getDatabase().$count(userDeckTable, getUserDeckConditions(filters));
 }
 
 export async function createUserDeck(data: NewUserDeck): Promise<UserDeck> {
-  try {
-    const rows = await db.insert(userDeckTable).values(data).returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating userDeck:", error);
-    throw error;
-  }
+  optionalDateWrite(data.lastReviewedAt, "lastReviewedAt");
+  const rows = await getDatabase().insert(userDeckTable).values(data).returning();
+  return rows[0]!;
 }
 
 export async function updateUserDeck(id: number, data: UpdateUserDeck) {
-  try {
-    validateUpdate(data, ["userId", "deckId"]);
-    const rows = await db
-      .update(userDeckTable)
-      .set(data)
-      .where(eq(userDeckTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating userDeck:", error);
-    throw error;
-  }
+  validateUpdate(data, ["userId", "deckId"]);
+  optionalDateWrite(data.lastReviewedAt, "lastReviewedAt");
+  const rows = await getDatabase()
+    .update(userDeckTable)
+    .set(data)
+    .where(eq(userDeckTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function deleteUserDeck(id: number) {
-  try {
-    const rows = await db
-      .delete(userDeckTable)
-      .where(eq(userDeckTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting userDeck:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userDeckTable)
+    .where(eq(userDeckTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function getUserDeckByUserAndDeck(userId: number, deckId: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userDeckTable)
-      .where(
-        and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
-      )
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching userDeck by relation:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userDeckTable)
+    .where(
+      and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
+    )
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getOrCreateUserDeck(
   data: NewUserDeck,
 ): Promise<UserDeck> {
-  try {
-    return db.transaction((tx) => {
-      const inserted = tx
-        .insert(userDeckTable)
-        .values(data)
-        .onConflictDoNothing({
-          target: [userDeckTable.userId, userDeckTable.deckId],
-        })
-        .returning()
-        .get();
-      if (inserted) return inserted;
+  optionalDateWrite(data.lastReviewedAt, "lastReviewedAt");
+  return getDatabase().transaction((tx) => {
+    const inserted = tx
+      .insert(userDeckTable)
+      .values(data)
+      .onConflictDoNothing({
+        target: [userDeckTable.userId, userDeckTable.deckId],
+      })
+      .returning()
+      .get();
+    if (inserted) return inserted;
 
-      return tx
-        .select()
-        .from(userDeckTable)
-        .where(
-          and(
-            eq(userDeckTable.userId, data.userId),
-            eq(userDeckTable.deckId, data.deckId),
-          ),
-        )
-        .get()!;
-    });
-  } catch (error) {
-    console.error("Error getting or creating userDeck:", error);
-    throw error;
-  }
+    return tx
+      .select()
+      .from(userDeckTable)
+      .where(
+        and(
+          eq(userDeckTable.userId, data.userId),
+          eq(userDeckTable.deckId, data.deckId),
+        ),
+      )
+      .get()!;
+  });
 }
 
 export async function deleteUserDeckByUserAndDeck(
   userId: number,
   deckId: number,
 ) {
-  try {
-    const rows = await db
-      .delete(userDeckTable)
-      .where(
-        and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
-      )
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting userDeck by relation:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userDeckTable)
+    .where(
+      and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
+    )
+    .returning();
+  return rows[0] ?? null;
 }
 
 export async function getDecksForUser(
   userId: number,
   options: PaginationOptions = {},
 ) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select({
-        deck: getColumns(deckTable),
-        subscription: getColumns(userDeckTable),
-      })
-      .from(userDeckTable)
-      .innerJoin(deckTable, eq(userDeckTable.deckId, deckTable.id))
-      .where(eq(userDeckTable.userId, userId))
-      .orderBy(asc(userDeckTable.id))
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching decks for user:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select({
+      deck: getColumns(deckTable),
+      subscription: getColumns(userDeckTable),
+    })
+    .from(userDeckTable)
+    .innerJoin(deckTable, eq(userDeckTable.deckId, deckTable.id))
+    .where(eq(userDeckTable.userId, userId))
+    .orderBy(asc(userDeckTable.id))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function markUserDeckReviewed(
@@ -204,17 +158,13 @@ export async function markUserDeckReviewed(
   deckId: number,
   reviewedAt: Date = new Date(),
 ) {
-  try {
-    const rows = await db
-      .update(userDeckTable)
-      .set({ lastReviewedAt: reviewedAt })
-      .where(
-        and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
-      )
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error marking user deck reviewed:", error);
-    throw error;
-  }
+  validateDateWrite(reviewedAt, "reviewedAt");
+  const rows = await getDatabase()
+    .update(userDeckTable)
+    .set({ lastReviewedAt: reviewedAt })
+    .where(
+      and(eq(userDeckTable.userId, userId), eq(userDeckTable.deckId, deckId)),
+    )
+    .returning();
+  return rows[0] ?? null;
 }

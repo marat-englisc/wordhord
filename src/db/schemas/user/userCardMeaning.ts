@@ -62,7 +62,7 @@ export const userCardMeaningTable = sqliteTable(
     check("user_card_meaning_state_check", sql`${table.state} IN (0, 1, 2, 3)`),
     check(
       "user_card_meaning_stability_check",
-      sql`typeof(${table.stability}) IN ('integer', 'real') AND ${table.stability} >= 0`,
+      sql`typeof(${table.stability}) IN ('integer', 'real') AND ${table.stability} BETWEEN 0 AND 1.7976931348623157e308`,
     ),
     check(
       "user_card_meaning_difficulty_check",
@@ -70,11 +70,17 @@ export const userCardMeaningTable = sqliteTable(
     ),
     check(
       "user_card_meaning_counters_check",
-      sql`typeof(${table.elapsedDays}) = 'integer' AND ${table.elapsedDays} >= 0
-        AND typeof(${table.scheduledDays}) = 'integer' AND ${table.scheduledDays} >= 0
-        AND typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} >= 0
-        AND typeof(${table.reps}) = 'integer' AND ${table.reps} >= 0
-        AND typeof(${table.lapses}) = 'integer' AND ${table.lapses} >= 0`,
+      sql`typeof(${table.elapsedDays}) = 'integer' AND ${table.elapsedDays} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.scheduledDays}) = 'integer' AND ${table.scheduledDays} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.reps}) = 'integer' AND ${table.reps} BETWEEN 0 AND 9007199254740991
+        AND typeof(${table.lapses}) = 'integer' AND ${table.lapses} BETWEEN 0 AND 9007199254740991`,
+    ),
+    check(
+      "user_card_meaning_dates_check",
+      sql`typeof(${table.due}) = 'integer' AND ${table.due} BETWEEN -8640000000000000 AND 8640000000000000
+        AND (${table.lastReview} IS NULL OR (typeof(${table.lastReview}) = 'integer'
+          AND ${table.lastReview} BETWEEN -8640000000000000 AND 8640000000000000))`,
     ),
   ],
 );

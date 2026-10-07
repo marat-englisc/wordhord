@@ -2,6 +2,7 @@ import { existsSync, realpathSync, statSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { drizzle } from "drizzle-orm/node-sqlite";
+import { normalizeSearchText } from "./search";
 import {
   assertContentReferences,
   assertDatabaseLayout,
@@ -88,6 +89,9 @@ export function openApplicationDatabase(paths: DatabasePaths) {
     assertForeignKeys(client, "content");
     assertContentReferences(client);
     installContentReferenceTriggers(client);
+    client.function("normalize_search", { deterministic: true }, (value) =>
+      typeof value === "string" ? normalizeSearchText(value) : null,
+    );
     return drizzle({ client });
   } catch (error) {
     client.close();

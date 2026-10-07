@@ -3,7 +3,13 @@ import { userCardMeaningTable } from "../../schemas/user/userCardMeaning";
 import type { NewUserCardMeaning } from "./userCardMeaningRepository";
 import type { Rating, State } from "ts-fsrs";
 import { userCardMeaningReviewTable } from "../../schemas/user/userCardMeaningReview";
-import { db } from "../../../config/db";
+import { getDatabase } from "../../../config/db";
+import {
+  mergeDefinedValues,
+  validateDateWrite,
+  validateProgressWrite,
+  validateReviewWrite,
+} from "../persistenceValidation";
 import {
   getPagination,
   validateUpdate,
@@ -68,98 +74,78 @@ function getUserCardMeaningReviewConditions(
 }
 
 export async function getUserCardMeaningReviewById(id: number) {
-  try {
-    const rows = await db
-      .select()
-      .from(userCardMeaningReviewTable)
-      .where(eq(userCardMeaningReviewTable.id, id))
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching userCardMeaningReview by ID:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userCardMeaningReviewTable)
+    .where(eq(userCardMeaningReviewTable.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getUserCardMeaningReviews(
   options: UserCardMeaningReviewQuery = {},
 ) {
-  try {
-    const { limit, offset } = getPagination(options);
-    return await db
-      .select()
-      .from(userCardMeaningReviewTable)
-      .where(getUserCardMeaningReviewConditions(options))
-      .orderBy(
-        desc(userCardMeaningReviewTable.review),
-        desc(userCardMeaningReviewTable.id),
-      )
-      .limit(limit)
-      .offset(offset);
-  } catch (error) {
-    console.error("Error fetching UserCardMeaningReviews:", error);
-    throw error;
-  }
+  const { limit, offset } = getPagination(options);
+  return await getDatabase()
+    .select()
+    .from(userCardMeaningReviewTable)
+    .where(getUserCardMeaningReviewConditions(options))
+    .orderBy(
+      desc(userCardMeaningReviewTable.review),
+      desc(userCardMeaningReviewTable.id),
+    )
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function countUserCardMeaningReviews(
   filters: UserCardMeaningReviewFilters = {},
 ) {
-  try {
-    return await db.$count(
-      userCardMeaningReviewTable,
-      getUserCardMeaningReviewConditions(filters),
-    );
-  } catch (error) {
-    console.error("Error counting UserCardMeaningReviews:", error);
-    throw error;
-  }
+  return await getDatabase().$count(
+    userCardMeaningReviewTable,
+    getUserCardMeaningReviewConditions(filters),
+  );
 }
 
 export async function createUserCardMeaningReview(
   data: NewUserCardMeaningReview,
 ): Promise<UserCardMeaningReview> {
-  try {
-    const rows = await db
-      .insert(userCardMeaningReviewTable)
-      .values(data)
-      .returning();
-    return rows[0]!;
-  } catch (error) {
-    console.error("Error creating userCardMeaningReview:", error);
-    throw error;
-  }
+  validateReviewWrite(data);
+  const rows = await getDatabase()
+    .insert(userCardMeaningReviewTable)
+    .values(data)
+    .returning();
+  return rows[0]!;
 }
 
 export async function updateUserCardMeaningReview(
   id: number,
   data: UpdateUserCardMeaningReview,
 ) {
-  try {
-    validateUpdate(data, ["userId", "cardMeaningId", "userCardMeaningId"]);
-    const rows = await db
+  validateUpdate(data, ["userId", "cardMeaningId", "userCardMeaningId"]);
+  return getDatabase().transaction((tx) => {
+    const existing = tx
+      .select()
+      .from(userCardMeaningReviewTable)
+      .where(eq(userCardMeaningReviewTable.id, id))
+      .get();
+    if (!existing) return null;
+    validateReviewWrite(mergeDefinedValues(existing, data));
+    return tx
       .update(userCardMeaningReviewTable)
       .set(data)
       .where(eq(userCardMeaningReviewTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error updating userCardMeaningReview:", error);
-    throw error;
-  }
+      .returning()
+      .get()!;
+  }, { behavior: "immediate" });
 }
 
 export async function deleteUserCardMeaningReview(id: number) {
-  try {
-    const rows = await db
-      .delete(userCardMeaningReviewTable)
-      .where(eq(userCardMeaningReviewTable.id, id))
-      .returning();
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error deleting userCardMeaningReview:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .delete(userCardMeaningReviewTable)
+    .where(eq(userCardMeaningReviewTable.id, id))
+    .returning();
+  return rows[0] ?? null;
 }
 
 export type NewReviewLog = Omit<
@@ -176,23 +162,18 @@ export type ReviewProgress = Omit<
 export async function getLatestUserCardMeaningReview(
   userCardMeaningId: number,
 ) {
-  try {
-    const rows = await db
-      .select()
-      .from(userCardMeaningReviewTable)
-      .where(
-        eq(userCardMeaningReviewTable.userCardMeaningId, userCardMeaningId),
-      )
-      .orderBy(
-        desc(userCardMeaningReviewTable.review),
-        desc(userCardMeaningReviewTable.id),
-      )
-      .limit(1);
-    return rows[0] ?? null;
-  } catch (error) {
-    console.error("Error fetching latest card meaning review:", error);
-    throw error;
-  }
+  const rows = await getDatabase()
+    .select()
+    .from(userCardMeaningReviewTable)
+    .where(
+      eq(userCardMeaningReviewTable.userCardMeaningId, userCardMeaningId),
+    )
+    .orderBy(
+      desc(userCardMeaningReviewTable.review),
+      desc(userCardMeaningReviewTable.id),
+    )
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function recordUserCardMeaningReview(
@@ -200,36 +181,34 @@ export async function recordUserCardMeaningReview(
   progress: ReviewProgress,
   review: NewReviewLog,
 ) {
-  try {
-    validateUpdate(progress, ["userId", "cardMeaningId"]);
-    return db.transaction((tx) => {
-      const existing = tx
-        .select()
-        .from(userCardMeaningTable)
-        .where(eq(userCardMeaningTable.id, userCardMeaningId))
-        .get();
-      if (!existing) return null;
+  validateUpdate(progress, ["userId", "cardMeaningId"]);
+  validateProgressWrite(progress);
+  validateDateWrite(progress.lastReview, "lastReview");
+  validateReviewWrite(review);
+  return getDatabase().transaction((tx) => {
+    const existing = tx
+      .select()
+      .from(userCardMeaningTable)
+      .where(eq(userCardMeaningTable.id, userCardMeaningId))
+      .get();
+    if (!existing) return null;
 
-      const updated = tx
-        .update(userCardMeaningTable)
-        .set(progress)
-        .where(eq(userCardMeaningTable.id, userCardMeaningId))
-        .returning()
-        .get()!;
-      const log = tx
-        .insert(userCardMeaningReviewTable)
-        .values({
-          ...review,
-          userId: existing.userId,
-          cardMeaningId: existing.cardMeaningId,
-          userCardMeaningId: existing.id,
-        })
-        .returning()
-        .get()!;
-      return { progress: updated, review: log };
-    });
-  } catch (error) {
-    console.error("Error recording card meaning review:", error);
-    throw error;
-  }
+    const updated = tx
+      .update(userCardMeaningTable)
+      .set(progress)
+      .where(eq(userCardMeaningTable.id, userCardMeaningId))
+      .returning()
+      .get()!;
+    const log = tx
+      .insert(userCardMeaningReviewTable)
+      .values({
+        ...review,
+        userId: existing.userId,
+        cardMeaningId: existing.cardMeaningId,
+        userCardMeaningId: existing.id,
+      })
+      .returning()
+      .get()!;
+    return { progress: updated, review: log };
+  }, { behavior: "immediate" });
 }
