@@ -1,4 +1,11 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import {
+  check,
+  index,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { ruleTable } from "./rule";
 
 export const ruleImageTable = sqliteTable(
@@ -12,7 +19,15 @@ export const ruleImageTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    image_url: text("image_url").notNull(),
+    order: integer("order").notNull().default(0),
+
+    imageUrl: text("image_url").notNull(),
   },
-  (table) => [index("rule_image_rule_id_index").on(table.ruleId)],
+  (table) => [
+    index("rule_images_rule_order_idx").on(table.ruleId, table.order),
+    check(
+      "rule_image_order_check",
+      sql`typeof(${table.order}) = 'integer' AND ${table.order} >= 0`,
+    ),
+  ],
 );

@@ -22,4 +22,7 @@ Telegram-бот для изучения английского языка. Вс�
 Миграция `model_integrity_and_indexes` обновляет существующую SQLite-схему с сохранением данных. Если старые записи нарушают новые ограничения FSRS или согласованность журнала, она откатывается; такие записи нужно исправить перед повторным запуском.
 При сохранении нового `ReviewLog` передавайте также `lastElapsedDays` и `learningSteps`. У старых записей эти поля остаются `NULL`, поскольку раньше они не сохранялись.
 
+Грамматические правила состоят из разделов, примеров, блоков основной информации и изображений. Порядок материалов задаётся полем `order`; при чтении сортируйте по `order`, затем по `id`. У дочерних элементов `order` по умолчанию равен `0`. Поле изображения в TypeScript — `imageUrl`.
+Пользователь может хранить одну личную заметку на каждое правило (`userRuleComment`). Таблицы грамматики создаются миграцией `grammar_models`, применяемой той же командой `npm run db:migrate`.
+
 Использованная официальная документация: [типы SQLite](https://orm.drizzle.team/docs/sqlite/column-types), [индексы и ограничения](https://orm.drizzle.team/docs/sqlite/indexes-constraints), [драйвер Node SQLite](https://orm.drizzle.team/docs/sqlite/connect-node-sqlite), [настройка Drizzle Kit](https://orm.drizzle.team/docs/drizzle-config-file).
