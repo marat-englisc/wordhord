@@ -35,10 +35,9 @@ export const userCardMeaningReviewTable = sqliteTable(
 
     elapsedDays: integer("elapsed_days").notNull(),
 
-    // Historical logs did not store these values; NULL preserves that distinction.
-    lastElapsedDays: integer("last_elapsed_days"),
+    lastElapsedDays: integer("last_elapsed_days").notNull(),
 
-    learningSteps: integer("learning_steps"),
+    learningSteps: integer("learning_steps").notNull(),
 
     review: integer("review", { mode: "timestamp_ms" }).notNull(),
   },
@@ -78,12 +77,8 @@ export const userCardMeaningReviewTable = sqliteTable(
       "user_card_meaning_review_counters_check",
       sql`typeof(${table.elapsedDays}) = 'integer' AND ${table.elapsedDays} >= 0
         AND typeof(${table.scheduledDays}) = 'integer' AND ${table.scheduledDays} >= 0
-        AND (${table.lastElapsedDays} IS NULL OR (
-          typeof(${table.lastElapsedDays}) = 'integer' AND ${table.lastElapsedDays} >= 0
-        ))
-        AND (${table.learningSteps} IS NULL OR (
-          typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} >= 0
-        ))`,
+        AND typeof(${table.lastElapsedDays}) = 'integer' AND ${table.lastElapsedDays} >= 0
+        AND typeof(${table.learningSteps}) = 'integer' AND ${table.learningSteps} >= 0`,
     ),
   ],
 );

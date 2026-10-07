@@ -2,10 +2,10 @@ import { defineConfig } from "drizzle-kit";
 import { CONSTANTS } from "./src/config/constants";
 
 export default defineConfig({
-  out: "./drizzle/content",
-  schema: ["./src/db/schemas/card/*.ts", "./src/db/schemas/grammar/*.ts"],
+  out: "./drizzle/users",
+  schema: "./src/db/schemas/user/*.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: CONSTANTS.CONTENT_DATABASE_URL,
+    url: CONSTANTS.USERS_DATABASE_URL,
   },
 });

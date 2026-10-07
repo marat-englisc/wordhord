@@ -10,7 +10,6 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
-import { cardMeaningTable } from "../card/cardMeaning";
 
 export const userCardMeaningTable = sqliteTable(
   "user_card_meaning",
@@ -23,11 +22,8 @@ export const userCardMeaningTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    cardMeaningId: integer("card_meaning_id")
-      .notNull()
-      .references(() => cardMeaningTable.id, {
-        onDelete: "cascade",
-      }),
+    // content.db reference, enforced by the application connection's TEMP triggers.
+    cardMeaningId: integer("card_meaning_id").notNull(),
 
     due: integer("due", { mode: "timestamp_ms" }).notNull(),
 

@@ -16,8 +16,10 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "npm run build && node --test",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:generate": "drizzle-kit generate --config=drizzle.config.ts && drizzle-kit generate --config=drizzle.users.config.ts",
+    "db:generate:content": "drizzle-kit generate --config=drizzle.config.ts",
+    "db:generate:users": "drizzle-kit generate --config=drizzle.users.config.ts",
+    "db:migrate": "tsx src/db/migrate.ts"
   },
   "engines": {
     "node": ">=24"

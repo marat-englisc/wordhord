@@ -14,11 +14,8 @@ export type UserCardMeaningReview =
   typeof userCardMeaningReviewTable.$inferSelect;
 export type NewUserCardMeaningReview = Omit<
   typeof userCardMeaningReviewTable.$inferInsert,
-  "id" | "createdAt" | "updatedAt" | "lastElapsedDays" | "learningSteps"
-> & {
-  lastElapsedDays: number;
-  learningSteps: number;
-};
+  "id" | "createdAt" | "updatedAt"
+>;
 export type UpdateUserCardMeaningReview = Partial<
   Omit<
     NewUserCardMeaningReview,

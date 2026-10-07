@@ -1,7 +1,8 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-sqlite";
 import { CONSTANTS } from "./constants";
+import { openApplicationDatabase } from "../db/connection";
 
-export const db = drizzle(CONSTANTS.DATABASE_URL);
-
-db.$client.exec("PRAGMA foreign_keys = ON");
+export const db = openApplicationDatabase({
+  contentPath: CONSTANTS.CONTENT_DATABASE_URL,
+  usersPath: CONSTANTS.USERS_DATABASE_URL,
+});

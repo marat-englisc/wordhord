@@ -1,35 +1,11 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "3d6c335c-7b24-42d8-a59d-2c2796598759",
+  "id": "409ba50d-90ee-44d0-8c4f-d3688590f5b6",
   "prevIds": [
-    "598b9ce4-366d-4b2c-bd10-b7e0ddcd8751"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
-    {
-      "name": "attribute",
-      "entityType": "tables"
-    },
-    {
-      "name": "card",
-      "entityType": "tables"
-    },
-    {
-      "name": "card_example",
-      "entityType": "tables"
-    },
-    {
-      "name": "card_meaning",
-      "entityType": "tables"
-    },
-    {
-      "name": "card_meaning_attribute",
-      "entityType": "tables"
-    },
-    {
-      "name": "deck",
-      "entityType": "tables"
-    },
     {
       "name": "user",
       "entityType": "tables"
@@ -47,324 +23,12 @@
       "entityType": "tables"
     },
     {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "attribute"
+      "name": "user_rule",
+      "entityType": "tables"
     },
     {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "name",
-      "entityType": "columns",
-      "table": "attribute"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
-      "generated": null,
-      "name": "created_at",
-      "entityType": "columns",
-      "table": "attribute"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "table": "attribute"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "deck_id",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "title",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "transcription",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "audio_url",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
-      "generated": null,
-      "name": "created_at",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "table": "card"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "card_example"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "card_meaning_id",
-      "entityType": "columns",
-      "table": "card_example"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "example",
-      "entityType": "columns",
-      "table": "card_example"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "example_translation",
-      "entityType": "columns",
-      "table": "card_example"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "card_id",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "hint",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "meaning",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "meaning_translation",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
-      "generated": null,
-      "name": "created_at",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "table": "card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "card_meaning_id",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "attribute_id",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "value",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
-      "generated": null,
-      "name": "created_at",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "deck"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "name",
-      "entityType": "columns",
-      "table": "deck"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
-      "generated": null,
-      "name": "created_at",
-      "entityType": "columns",
-      "table": "deck"
-    },
-    {
-      "type": "text",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "table": "deck"
+      "name": "user_rule_comment",
+      "entityType": "tables"
     },
     {
       "type": "integer",
@@ -767,79 +431,104 @@
       "table": "user_deck"
     },
     {
-      "columns": [
-        "deck_id"
-      ],
-      "tableTo": "deck",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "RESTRICT",
-      "nameExplicit": false,
-      "name": "fk_card_deck_id_deck_id_fk",
-      "entityType": "fks",
-      "table": "card"
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "user_rule"
     },
     {
-      "columns": [
-        "card_meaning_id"
-      ],
-      "tableTo": "card_meaning",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_card_example_card_meaning_id_card_meaning_id_fk",
-      "entityType": "fks",
-      "table": "card_example"
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "table": "user_rule"
     },
     {
-      "columns": [
-        "card_id"
-      ],
-      "tableTo": "card",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_card_meaning_card_id_card_id_fk",
-      "entityType": "fks",
-      "table": "card_meaning"
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "rule_id",
+      "entityType": "columns",
+      "table": "user_rule"
     },
     {
-      "columns": [
-        "card_meaning_id"
-      ],
-      "tableTo": "card_meaning",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_card_meaning_attribute_card_meaning_id_card_meaning_id_fk",
-      "entityType": "fks",
-      "table": "card_meaning_attribute"
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(CURRENT_TIMESTAMP)",
+      "generated": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "table": "user_rule"
     },
     {
-      "columns": [
-        "attribute_id"
-      ],
-      "tableTo": "attribute",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_card_meaning_attribute_attribute_id_attribute_id_fk",
-      "entityType": "fks",
-      "table": "card_meaning_attribute"
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "user_rule_comment"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "table": "user_rule_comment"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "rule_id",
+      "entityType": "columns",
+      "table": "user_rule_comment"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "comment",
+      "entityType": "columns",
+      "table": "user_rule_comment"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(CURRENT_TIMESTAMP)",
+      "generated": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "table": "user_rule_comment"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(CURRENT_TIMESTAMP)",
+      "generated": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "table": "user_rule_comment"
     },
     {
       "columns": [
@@ -853,21 +542,6 @@
       "onDelete": "CASCADE",
       "nameExplicit": false,
       "name": "fk_user_card_meaning_user_id_user_id_fk",
-      "entityType": "fks",
-      "table": "user_card_meaning"
-    },
-    {
-      "columns": [
-        "card_meaning_id"
-      ],
-      "tableTo": "card_meaning",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_user_card_meaning_card_meaning_id_card_meaning_id_fk",
       "entityType": "fks",
       "table": "user_card_meaning"
     },
@@ -907,72 +581,33 @@
     },
     {
       "columns": [
-        "deck_id"
+        "user_id"
       ],
-      "tableTo": "deck",
+      "tableTo": "user",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "fk_user_deck_deck_id_deck_id_fk",
+      "name": "fk_user_rule_user_id_user_id_fk",
       "entityType": "fks",
-      "table": "user_deck"
+      "table": "user_rule"
     },
     {
       "columns": [
+        "user_id"
+      ],
+      "tableTo": "user",
+      "columnsTo": [
         "id"
       ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "attribute_pk",
-      "table": "attribute",
-      "entityType": "pks"
-    },
-    {
-      "columns": [
-        "id"
-      ],
-      "nameExplicit": false,
-      "name": "card_pk",
-      "table": "card",
-      "entityType": "pks"
-    },
-    {
-      "columns": [
-        "id"
-      ],
-      "nameExplicit": false,
-      "name": "card_example_pk",
-      "table": "card_example",
-      "entityType": "pks"
-    },
-    {
-      "columns": [
-        "id"
-      ],
-      "nameExplicit": false,
-      "name": "card_meaning_pk",
-      "table": "card_meaning",
-      "entityType": "pks"
-    },
-    {
-      "columns": [
-        "id"
-      ],
-      "nameExplicit": false,
-      "name": "card_meaning_attribute_pk",
-      "table": "card_meaning_attribute",
-      "entityType": "pks"
-    },
-    {
-      "columns": [
-        "id"
-      ],
-      "nameExplicit": false,
-      "name": "deck_pk",
-      "table": "deck",
-      "entityType": "pks"
+      "name": "fk_user_rule_comment_user_id_user_id_fk",
+      "entityType": "fks",
+      "table": "user_rule_comment"
     },
     {
       "columns": [
@@ -1012,81 +647,21 @@
     },
     {
       "columns": [
-        {
-          "value": "deck_id",
-          "isExpression": false
-        }
+        "id"
       ],
-      "isUnique": false,
-      "where": null,
-      "origin": "manual",
-      "name": "cards_deck_id_index",
-      "entityType": "indexes",
-      "table": "card"
+      "nameExplicit": false,
+      "name": "user_rule_pk",
+      "table": "user_rule",
+      "entityType": "pks"
     },
     {
       "columns": [
-        {
-          "value": "card_meaning_id",
-          "isExpression": false
-        }
+        "id"
       ],
-      "isUnique": false,
-      "where": null,
-      "origin": "manual",
-      "name": "card_examples_card_meaning_id_index",
-      "entityType": "indexes",
-      "table": "card_example"
-    },
-    {
-      "columns": [
-        {
-          "value": "card_id",
-          "isExpression": false
-        }
-      ],
-      "isUnique": false,
-      "where": null,
-      "origin": "manual",
-      "name": "card_meanings_card_id_index",
-      "entityType": "indexes",
-      "table": "card_meaning"
-    },
-    {
-      "columns": [
-        {
-          "value": "card_meaning_id",
-          "isExpression": false
-        },
-        {
-          "value": "attribute_id",
-          "isExpression": false
-        },
-        {
-          "value": "value",
-          "isExpression": false
-        }
-      ],
-      "isUnique": true,
-      "where": null,
-      "origin": "manual",
-      "name": "card_meaning_attribute_unique",
-      "entityType": "indexes",
-      "table": "card_meaning_attribute"
-    },
-    {
-      "columns": [
-        {
-          "value": "attribute_id",
-          "isExpression": false
-        }
-      ],
-      "isUnique": false,
-      "where": null,
-      "origin": "manual",
-      "name": "card_meaning_attributes_attribute_idx",
-      "entityType": "indexes",
-      "table": "card_meaning_attribute"
+      "nameExplicit": false,
+      "name": "user_rule_comment_pk",
+      "table": "user_rule_comment",
+      "entityType": "pks"
     },
     {
       "columns": [
@@ -1205,6 +780,70 @@
       "name": "user_decks_deck_idx",
       "entityType": "indexes",
       "table": "user_deck"
+    },
+    {
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false
+        },
+        {
+          "value": "rule_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "origin": "manual",
+      "name": "user_rule_unique",
+      "entityType": "indexes",
+      "table": "user_rule"
+    },
+    {
+      "columns": [
+        {
+          "value": "rule_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_rules_rule_idx",
+      "entityType": "indexes",
+      "table": "user_rule"
+    },
+    {
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false
+        },
+        {
+          "value": "rule_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "origin": "manual",
+      "name": "user_rule_comment_unique",
+      "entityType": "indexes",
+      "table": "user_rule_comment"
+    },
+    {
+      "columns": [
+        {
+          "value": "rule_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "user_rule_comments_rule_idx",
+      "entityType": "indexes",
+      "table": "user_rule_comment"
     },
     {
       "columns": [

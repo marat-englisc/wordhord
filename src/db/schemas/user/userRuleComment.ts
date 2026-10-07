@@ -7,7 +7,6 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
 import { sql } from "drizzle-orm";
-import { ruleTable } from "../grammar/rule";
 
 export const userRuleCommentTable = sqliteTable(
   "user_rule_comment",
@@ -20,11 +19,8 @@ export const userRuleCommentTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    ruleId: integer("rule_id")
-      .notNull()
-      .references(() => ruleTable.id, {
-        onDelete: "cascade",
-      }),
+    // content.db reference, enforced by the application connection's TEMP triggers.
+    ruleId: integer("rule_id").notNull(),
 
     comment: text("comment").notNull(),
 

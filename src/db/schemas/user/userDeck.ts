@@ -7,7 +7,6 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { userTable } from "./user";
-import { deckTable } from "../card/deck";
 
 export const userDeckTable = sqliteTable(
   "user_deck",
@@ -20,11 +19,8 @@ export const userDeckTable = sqliteTable(
         onDelete: "cascade",
       }),
 
-    deckId: integer("deck_id")
-      .notNull()
-      .references(() => deckTable.id, {
-        onDelete: "cascade",
-      }),
+    // content.db reference, enforced by the application connection's TEMP triggers.
+    deckId: integer("deck_id").notNull(),
 
     createdAt: text("created_at")
       .notNull()

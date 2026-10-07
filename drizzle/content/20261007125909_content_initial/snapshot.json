@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "598b9ce4-366d-4b2c-bd10-b7e0ddcd8751",
+  "id": "2bd1a77d-e3da-43a8-859a-7635f8f3aa2c",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -31,19 +31,23 @@
       "entityType": "tables"
     },
     {
-      "name": "user",
+      "name": "rule",
       "entityType": "tables"
     },
     {
-      "name": "user_card_meaning",
+      "name": "rule_image",
       "entityType": "tables"
     },
     {
-      "name": "user_card_meaning_review",
+      "name": "rule_section",
       "entityType": "tables"
     },
     {
-      "name": "user_deck",
+      "name": "rule_section_example",
+      "entityType": "tables"
+    },
+    {
+      "name": "rule_section_primary_info",
       "entityType": "tables"
     },
     {
@@ -374,7 +378,7 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
-      "table": "user"
+      "table": "rule"
     },
     {
       "type": "integer",
@@ -382,49 +386,19 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "telegram_id",
+      "name": "order",
       "entityType": "columns",
-      "table": "user"
+      "table": "rule"
     },
     {
       "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "username",
-      "entityType": "columns",
-      "table": "user"
-    },
-    {
-      "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "first_name",
-      "entityType": "columns",
-      "table": "user"
-    },
-    {
-      "type": "text",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "last_name",
-      "entityType": "columns",
-      "table": "user"
-    },
-    {
-      "type": "integer",
       "notNull": true,
       "autoincrement": false,
-      "default": "false",
+      "default": null,
       "generated": null,
-      "name": "is_admin",
+      "name": "name",
       "entityType": "columns",
-      "table": "user"
+      "table": "rule"
     },
     {
       "type": "text",
@@ -434,7 +408,7 @@
       "generated": null,
       "name": "created_at",
       "entityType": "columns",
-      "table": "user"
+      "table": "rule"
     },
     {
       "type": "text",
@@ -444,7 +418,7 @@
       "generated": null,
       "name": "updated_at",
       "entityType": "columns",
-      "table": "user"
+      "table": "rule"
     },
     {
       "type": "integer",
@@ -454,7 +428,7 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
-      "table": "user_card_meaning"
+      "table": "rule_image"
     },
     {
       "type": "integer",
@@ -462,289 +436,169 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "user_id",
+      "name": "rule_id",
       "entityType": "columns",
-      "table": "user_card_meaning"
+      "table": "rule_image"
     },
     {
       "type": "integer",
       "notNull": true,
       "autoincrement": false,
-      "default": null,
+      "default": "0",
       "generated": null,
-      "name": "card_meaning_id",
+      "name": "order",
       "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "due",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "real",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "stability",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "real",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "difficulty",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "elapsed_days",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "scheduled_days",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "learning_steps",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "reps",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "lapses",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "state",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "last_review",
-      "entityType": "columns",
-      "table": "user_card_meaning"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "user_id",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "card_meaning_id",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "user_card_meaning_id",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "rating",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "state",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "due",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "real",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "stability",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "real",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "difficulty",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "scheduled_days",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "elapsed_days",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "review",
-      "entityType": "columns",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "type": "integer",
-      "notNull": false,
-      "autoincrement": true,
-      "default": null,
-      "generated": null,
-      "name": "id",
-      "entityType": "columns",
-      "table": "user_deck"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "user_id",
-      "entityType": "columns",
-      "table": "user_deck"
-    },
-    {
-      "type": "integer",
-      "notNull": true,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "deck_id",
-      "entityType": "columns",
-      "table": "user_deck"
+      "table": "rule_image"
     },
     {
       "type": "text",
       "notNull": true,
       "autoincrement": false,
-      "default": "(CURRENT_TIMESTAMP)",
+      "default": null,
       "generated": null,
-      "name": "created_at",
+      "name": "image_url",
       "entityType": "columns",
-      "table": "user_deck"
+      "table": "rule_image"
     },
     {
       "type": "integer",
       "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "rule_section"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "last_reviewed_at",
+      "name": "rule_id",
       "entityType": "columns",
-      "table": "user_deck"
+      "table": "rule_section"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "order",
+      "entityType": "columns",
+      "table": "rule_section"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "title",
+      "entityType": "columns",
+      "table": "rule_section"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "content",
+      "entityType": "columns",
+      "table": "rule_section"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "rule_section_example"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "rule_section_id",
+      "entityType": "columns",
+      "table": "rule_section_example"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "order",
+      "entityType": "columns",
+      "table": "rule_section_example"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "example",
+      "entityType": "columns",
+      "table": "rule_section_example"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "example_translation",
+      "entityType": "columns",
+      "table": "rule_section_example"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "rule_section_primary_info"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "rule_section_id",
+      "entityType": "columns",
+      "table": "rule_section_primary_info"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "order",
+      "entityType": "columns",
+      "table": "rule_section_primary_info"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "content",
+      "entityType": "columns",
+      "table": "rule_section_primary_info"
     },
     {
       "columns": [
@@ -823,108 +677,63 @@
     },
     {
       "columns": [
-        "user_id"
+        "rule_id"
       ],
-      "tableTo": "user",
+      "tableTo": "rule",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "fk_user_card_meaning_user_id_user_id_fk",
+      "name": "fk_rule_image_rule_id_rule_id_fk",
       "entityType": "fks",
-      "table": "user_card_meaning"
+      "table": "rule_image"
     },
     {
       "columns": [
-        "card_meaning_id"
+        "rule_id"
       ],
-      "tableTo": "card_meaning",
+      "tableTo": "rule",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "fk_user_card_meaning_card_meaning_id_card_meaning_id_fk",
+      "name": "fk_rule_section_rule_id_rule_id_fk",
       "entityType": "fks",
-      "table": "user_card_meaning"
+      "table": "rule_section"
     },
     {
       "columns": [
-        "user_id"
+        "rule_section_id"
       ],
-      "tableTo": "user",
+      "tableTo": "rule_section",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "fk_user_card_meaning_review_user_id_user_id_fk",
+      "name": "fk_rule_section_example_rule_section_id_rule_section_id_fk",
       "entityType": "fks",
-      "table": "user_card_meaning_review"
+      "table": "rule_section_example"
     },
     {
       "columns": [
-        "card_meaning_id"
+        "rule_section_id"
       ],
-      "tableTo": "card_meaning",
+      "tableTo": "rule_section",
       "columnsTo": [
         "id"
       ],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "nameExplicit": false,
-      "name": "fk_user_card_meaning_review_card_meaning_id_card_meaning_id_fk",
+      "name": "fk_rule_section_primary_info_rule_section_id_rule_section_id_fk",
       "entityType": "fks",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "columns": [
-        "user_card_meaning_id"
-      ],
-      "tableTo": "user_card_meaning",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_user_card_meaning_review_user_card_meaning_id_user_card_meaning_id_fk",
-      "entityType": "fks",
-      "table": "user_card_meaning_review"
-    },
-    {
-      "columns": [
-        "user_id"
-      ],
-      "tableTo": "user",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_user_deck_user_id_user_id_fk",
-      "entityType": "fks",
-      "table": "user_deck"
-    },
-    {
-      "columns": [
-        "deck_id"
-      ],
-      "tableTo": "deck",
-      "columnsTo": [
-        "id"
-      ],
-      "onUpdate": "NO ACTION",
-      "onDelete": "CASCADE",
-      "nameExplicit": false,
-      "name": "fk_user_deck_deck_id_deck_id_fk",
-      "entityType": "fks",
-      "table": "user_deck"
+      "table": "rule_section_primary_info"
     },
     {
       "columns": [
@@ -985,8 +794,8 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "user_pk",
-      "table": "user",
+      "name": "rule_pk",
+      "table": "rule",
       "entityType": "pks"
     },
     {
@@ -994,8 +803,8 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "user_card_meaning_pk",
-      "table": "user_card_meaning",
+      "name": "rule_image_pk",
+      "table": "rule_image",
       "entityType": "pks"
     },
     {
@@ -1003,8 +812,8 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "user_card_meaning_review_pk",
-      "table": "user_card_meaning_review",
+      "name": "rule_section_pk",
+      "table": "rule_section",
       "entityType": "pks"
     },
     {
@@ -1012,8 +821,17 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "user_deck_pk",
-      "table": "user_deck",
+      "name": "rule_section_example_pk",
+      "table": "rule_section_example",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "rule_section_primary_info_pk",
+      "table": "rule_section_primary_info",
       "entityType": "pks"
     },
     {
@@ -1083,83 +901,132 @@
     {
       "columns": [
         {
-          "value": "user_id",
-          "isExpression": false
-        },
-        {
-          "value": "card_meaning_id",
-          "isExpression": false
-        }
-      ],
-      "isUnique": true,
-      "where": null,
-      "origin": "manual",
-      "name": "user_card_meaning_unique",
-      "entityType": "indexes",
-      "table": "user_card_meaning"
-    },
-    {
-      "columns": [
-        {
-          "value": "user_id",
-          "isExpression": false
-        },
-        {
-          "value": "due",
+          "value": "attribute_id",
           "isExpression": false
         }
       ],
       "isUnique": false,
       "where": null,
       "origin": "manual",
-      "name": "user_card_meanings_due_idx",
+      "name": "card_meaning_attributes_attribute_idx",
       "entityType": "indexes",
-      "table": "user_card_meaning"
+      "table": "card_meaning_attribute"
     },
     {
       "columns": [
         {
-          "value": "user_id",
-          "isExpression": false
-        },
-        {
-          "value": "review",
+          "value": "order",
           "isExpression": false
         }
       ],
       "isUnique": false,
       "where": null,
       "origin": "manual",
-      "name": "user_card_meaning_reviews_user_idx",
+      "name": "rules_order_idx",
       "entityType": "indexes",
-      "table": "user_card_meaning_review"
+      "table": "rule"
     },
     {
       "columns": [
         {
-          "value": "user_id",
+          "value": "rule_id",
           "isExpression": false
         },
         {
-          "value": "deck_id",
+          "value": "order",
           "isExpression": false
         }
       ],
-      "isUnique": true,
+      "isUnique": false,
       "where": null,
       "origin": "manual",
-      "name": "user_deck_unique",
+      "name": "rule_images_rule_order_idx",
       "entityType": "indexes",
-      "table": "user_deck"
+      "table": "rule_image"
     },
     {
       "columns": [
-        "telegram_id"
+        {
+          "value": "rule_id",
+          "isExpression": false
+        },
+        {
+          "value": "order",
+          "isExpression": false
+        }
       ],
-      "nameExplicit": false,
-      "name": "user_telegram_id_unique",
-      "entityType": "uniques",
-      "table": "user"
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "rule_sections_rule_order_idx",
+      "entityType": "indexes",
+      "table": "rule_section"
+    },
+    {
+      "columns": [
+        {
+          "value": "rule_section_id",
+          "isExpression": false
+        },
+        {
+          "value": "order",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "rule_section_examples_section_order_idx",
+      "entityType": "indexes",
+      "table": "rule_section_example"
+    },
+    {
+      "columns": [
+        {
+          "value": "rule_section_id",
+          "isExpression": false
+        },
+        {
+          "value": "order",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "rule_section_primary_info_section_order_idx",
+      "entityType": "indexes",
+      "table": "rule_section_primary_info"
+    },
+    {
+      "value": "typeof(\"order\") = 'integer' AND \"order\" >= 0",
+      "name": "rule_order_check",
+      "entityType": "checks",
+      "table": "rule"
+    },
+    {
+      "value": "typeof(\"order\") = 'integer' AND \"order\" >= 0",
+      "name": "rule_image_order_check",
+      "entityType": "checks",
+      "table": "rule_image"
+    },
+    {
+      "value": "typeof(\"order\") = 'integer' AND \"order\" >= 0",
+      "name": "rule_section_order_check",
+      "entityType": "checks",
+      "table": "rule_section"
+    },
+    {
+      "value": "typeof(\"order\") = 'integer' AND \"order\" >= 0",
+      "name": "rule_section_example_order_check",
+      "entityType": "checks",
+      "table": "rule_section_example"
+    },
+    {
+      "value": "typeof(\"order\") = 'integer' AND \"order\" >= 0",
+      "name": "rule_section_primary_info_order_check",
+      "entityType": "checks",
+      "table": "rule_section_primary_info"
     }
   ],
   "renames": []
